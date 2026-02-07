@@ -33,5 +33,27 @@ def test_project_runner():
 
     runner.test(hdl_toplevel="tb_tt", test_module="test_tt", waves=waves)
 
+def test_pulser_runner():
+    sim = os.getenv("SIM", "icarus")
+    waves = os.getenv("WAVES", 1)
+
+    test_dir = Path(__file__).resolve().parent
+    src_dir = test_dir.parent / "src"
+
+    sources = [
+        src_dir / "pulser.v",
+        test_dir / "tb_pulser.v"
+    ]
+
+    runner = get_runner(sim)
+    runner.build(
+        sources=sources,
+        hdl_toplevel="tb_pulser",
+        always=True
+    )
+
+    runner.test(hdl_toplevel="tb_pulser", test_module="test_pulser", waves=waves)
+
 if __name__ == "__main__":
     test_project_runner()
+    test_pulser_runner()
