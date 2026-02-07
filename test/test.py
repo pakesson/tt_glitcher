@@ -62,6 +62,7 @@ def test_uart_runner():
     src_dir = test_dir.parent / "src"
 
     sources = [
+        src_dir / "uart_rx.v",
         src_dir / "uart_tx.v",
         test_dir / "tb_uart.v"
     ]

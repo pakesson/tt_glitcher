@@ -13,6 +13,21 @@ module tb_uart ();
     reg rst_n;
     wire rst = ~rst_n;
 
+    reg uart_rx;
+    wire [7:0] uart_rx_data;
+    wire uart_rx_valid;
+
+    uart_rx #(
+        .CLK_FREQ(50_000_000),
+        .BAUD_RATE(115200)
+    ) rxi (
+        .rst(rst),
+        .clk(clk),
+        .rx_i(uart_rx),
+        .data_o(uart_rx_data),
+        .data_valid_o(uart_rx_valid)
+    );
+
     wire uart_tx;
     wire uart_tx_busy;
     wire uart_tx_rdy = !uart_tx_busy;
