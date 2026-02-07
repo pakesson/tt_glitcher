@@ -1,40 +1,37 @@
-# SPDX-FileCopyrightText: © 2024 Tiny Tapeout
-# SPDX-License-Identifier: Apache-2.0
+import os
+from pathlib import Path
 
-import cocotb
-from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles
+from cocotb_tools.runner import get_runner
 
+PDK_ROOT = Path(os.getenv("PDK_ROOT"))
 
-@cocotb.test()
-async def test_project(dut):
-    dut._log.info("Start")
+def test_project_runner():
+    sim = os.getenv("SIM", "icarus")
+    waves = os.getenv("WAVES", 1)
+    gl_test = os.getenv("GATES", False)
 
-    # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 10, unit="us")
-    cocotb.start_soon(clock.start())
+    test_dir = Path(__file__).resolve().parent
+    src_dir = test_dir.parent / "src"
 
-    # Reset
-    dut._log.info("Reset")
-    dut.ena.value = 1
-    dut.ui_in.value = 0
-    dut.uio_in.value = 0
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
-    dut.rst_n.value = 1
+    sources = []
+    if gl_test == "yes" or gl_test == "1" or gl_test == "true":
+        sources += [test_dir / "gate_level_netlist.v"]
+        sources += [PDK_ROOT / "ihp-sg13g2/libs.ref/sg13g2_io/verilog/sg13g2_io.v"]
+        sources += [PDK_ROOT / "ihp-sg13g2/libs.ref/sg13g2_stdcell/verilog/sg13g2_stdcell.v"]
 
-    dut._log.info("Test project behavior")
+    else:
+        sources += list(src_dir.glob("*.v"))
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    sources += [test_dir / "tb_tt.v"]
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    runner = get_runner(sim)
+    runner.build(
+        sources=sources,
+        hdl_toplevel="tb_tt",
+        always=True
+    )
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+    runner.test(hdl_toplevel="tb_tt", test_module="test_tt", waves=waves)
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+if __name__ == "__main__":
+    test_project_runner()
