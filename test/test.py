@@ -54,6 +54,29 @@ def test_pulser_runner():
 
     runner.test(hdl_toplevel="tb_pulser", test_module="test_pulser", waves=waves)
 
+def test_uart_runner():
+    sim = os.getenv("SIM", "icarus")
+    waves = os.getenv("WAVES", 1)
+
+    test_dir = Path(__file__).resolve().parent
+    src_dir = test_dir.parent / "src"
+
+    sources = [
+        src_dir / "uart_tx.v",
+        test_dir / "tb_uart.v"
+    ]
+
+    runner = get_runner(sim)
+    runner.build(
+        sources=sources,
+        hdl_toplevel="tb_uart",
+        always=True
+    )
+
+    runner.test(hdl_toplevel="tb_uart", test_module="test_uart", waves=waves)
+
+
 if __name__ == "__main__":
     test_project_runner()
     test_pulser_runner()
+    test_uart_runner()
