@@ -26,7 +26,8 @@ async def test_uart_handler_echo(dut):
     uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
     uart_sink = UartSink(dut.uart_tx, baud=115200, bits=8)
 
-    for x in range(0, 0x10):
+    # Unrecognized command bytes will be echoed back
+    for x in range(0x10, 0x20):
         await uart_source.write(bytes([x]))
         await uart_source.wait()
 

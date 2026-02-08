@@ -46,9 +46,15 @@ module uart_handler #(
         .tx_busy_o(uart_tx_busy)
     );
 
-    reg [1:0] state;
-    localparam STATE_IDLE = 2'd0;
-    localparam STATE_SEND_ECHO = 2'd1;
+    reg [2:0] state;
+    localparam STATE_IDLE = 3'd0;
+    localparam STATE_SEND_ECHO = 3'd1;
+    localparam STATE_DELAY1 = 3'd2;
+    localparam STATE_DELAY0 = 3'd3;
+    localparam STATE_WIDTH = 3'd4;
+    localparam STATE_NUM_PULSES = 3'd5;
+    localparam STATE_PULSE_SPACING1 = 3'd6;
+    localparam STATE_PULSE_SPACING0 = 3'd7;
 
     always @(posedge clk) begin
         if (rst) begin
@@ -68,12 +74,52 @@ module uart_handler #(
             case(state)
                 STATE_IDLE:
                     if (uart_rx_valid) begin
-                        uart_tx_data <= uart_rx_data;
-                        state <= STATE_SEND_ECHO;
+                        case (uart_rx_data)
+                            8'h00: state <= STATE_DELAY1;
+                            8'h01: state <= STATE_WIDTH;
+                            8'h02: state <= STATE_NUM_PULSES;
+                            8'h03: state <= STATE_PULSE_SPACING1;
+                            default: 
+                                begin
+                                    // Echo back the received byte for unrecognized commands
+                                    uart_tx_data <= uart_rx_data;
+                                    state <= STATE_SEND_ECHO;
+                                end
+                        endcase
                     end
                 STATE_SEND_ECHO:
                     if (uart_tx_rdy) begin
                         uart_tx_en <= 1'b1;
+                        state <= STATE_IDLE;
+                    end
+                STATE_DELAY1:
+                    if (uart_rx_valid) begin
+                        delay_o[15:8] <= uart_rx_data;
+                        state <= STATE_DELAY0;
+                    end
+                STATE_DELAY0:
+                    if (uart_rx_valid) begin
+                        delay_o[7:0] <= uart_rx_data;
+                        state <= STATE_IDLE;
+                    end
+                STATE_WIDTH:
+                    if (uart_rx_valid) begin
+                        width_o <= uart_rx_data;
+                        state <= STATE_IDLE;
+                    end
+                STATE_NUM_PULSES:
+                    if (uart_rx_valid) begin
+                        num_pulses_o <= uart_rx_data;
+                        state <= STATE_IDLE;
+                    end
+                STATE_PULSE_SPACING1:
+                    if (uart_rx_valid) begin
+                        pulse_spacing_o[15:8] <= uart_rx_data;
+                        state <= STATE_PULSE_SPACING0;
+                    end
+                STATE_PULSE_SPACING0:
+                    if (uart_rx_valid) begin
+                        pulse_spacing_o[7:0] <= uart_rx_data;
                         state <= STATE_IDLE;
                     end
                 default:
