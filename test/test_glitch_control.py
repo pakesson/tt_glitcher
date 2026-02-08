@@ -1,6 +1,3 @@
-# SPDX-FileCopyrightText: © 2024 Tiny Tapeout
-# SPDX-License-Identifier: Apache-2.0
-
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
@@ -8,7 +5,7 @@ from cocotb.triggers import ClockCycles
 from cocotbext.uart import UartSink, UartSource
 
 @cocotb.test()
-async def test_project_echo(dut):
+async def test_glitch_control_echo(dut):
     dut._log.info("Start")
 
     # Set the clock period to 20 ns (50 MHz)
@@ -24,7 +21,7 @@ async def test_project_echo(dut):
     dut.rst_n.value = 1
     await ClockCycles(dut.clk, 1)
 
-    dut._log.info("Test project echo")
+    dut._log.info("Test glitch control echo")
 
     uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
     uart_sink = UartSink(dut.uart_tx, baud=115200, bits=8)

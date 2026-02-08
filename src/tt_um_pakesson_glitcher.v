@@ -16,12 +16,38 @@ module tt_um_pakesson_glitcher (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+    wire rst = ~rst_n;
 
-  // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+    wire uart_rx = ui_in[0];
+    wire trigger_in = ui_in[1];
+
+    wire uart_tx;
+    assign uo_out[0] = uart_tx;
+
+    wire pulse_out;
+    wire target_reset_out;
+    assign uo_out[1] = pulse_out;
+    assign uo_out[2] = target_reset_out;
+
+    glitch_control #(
+        .CLK_FREQ(50_000_000),
+        .BAUD_RATE(115200)
+    ) glitch_ctrl (
+        .rst(rst),
+        .clk(clk),
+        .uart_rx_i(uart_rx),
+        .uart_tx_o(uart_tx),
+        .trigger_i(trigger_in),
+        .pulse_o(pulse_out),
+        .target_reset_o(target_reset_out)
+    );
+
+    // All output pins must be assigned. If not used, assign to 0.
+    assign uio_out = 0;
+    assign uio_oe  = 0;
+    assign uo_out[7:3] = 5'b0;
+
+    // List all unused inputs to prevent warnings
+    wire _unused = &{ena, clk, ui_in[7:2], 1'b0};
 
 endmodule

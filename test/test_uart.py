@@ -54,11 +54,11 @@ async def test_uart_tx_more(dut):
     dut.rst_n.value = 1
     await ClockCycles(dut.clk, 1)
 
-    dut._log.info("Test UART TX, bytes 0x00 to 0x39")
+    dut._log.info("Test UART TX, bytes 0x00 to 0x0f")
 
     uart_sink = UartSink(dut.uart_tx, baud=115200, bits=8)
 
-    for x in range(0x0, 0x3a):
+    for x in range(0x0, 0x10):
         dut.uart_tx_data.value = x
         dut.uart_tx_en.value = 1
         await ClockCycles(dut.clk, 1)

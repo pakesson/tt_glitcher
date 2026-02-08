@@ -23,6 +23,11 @@ module tb_tt ();
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
 
+  reg uart_rx;
+  assign ui_in[0] = uart_rx;
+
+  wire uart_tx = uo_out[0];
+
   tt_um_pakesson_glitcher user_project (
       .ui_in  (ui_in),    // Dedicated inputs
       .uo_out (uo_out),   // Dedicated outputs
