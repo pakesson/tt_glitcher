@@ -18,13 +18,19 @@ project:
   # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
   source_files:
     - "tt_um_pakesson_glitcher.v"
+    - "glitch_control.v"
+    - "uart_handler.v"
+    - "uart_rx.v"
+    - "uart_tx.v"
+    - "pulser.v"
+
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
 pinout:
   # Inputs
-  ui[0]: ""
-  ui[1]: ""
+  ui[0]: "UART RX"
+  ui[1]: "Glitch Trigger"
   ui[2]: ""
   ui[3]: ""
   ui[4]: ""
@@ -33,9 +39,9 @@ pinout:
   ui[7]: ""
 
   # Outputs
-  uo[0]: ""
-  uo[1]: ""
-  uo[2]: ""
+  uo[0]: "UART TX"
+  uo[1]: "Glitch Out"
+  uo[2]: "Target Reset"
   uo[3]: ""
   uo[4]: ""
   uo[5]: ""
