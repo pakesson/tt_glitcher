@@ -19,8 +19,8 @@ module uart_handler #(
     wire [7:0] uart_rx_data;
     
     uart_rx #(
-        .CLK_FREQ(50_000_000),
-        .BAUD_RATE(115200)
+        .CLK_FREQ(CLK_FREQ),
+        .BAUD_RATE(BAUD_RATE)
     ) rxi (
         .clk(clk),
         .rst(rst),
@@ -35,8 +35,8 @@ module uart_handler #(
     reg [7:0] uart_tx_data;
 
     uart_tx #(
-        .CLK_FREQ(50_000_000),
-        .BAUD_RATE(115200)
+        .CLK_FREQ(CLK_FREQ),
+        .BAUD_RATE(BAUD_RATE)
     ) txi (
         .clk(clk),
         .rst(rst),

@@ -34,4 +34,9 @@ module glitch_control #(
         .pulse_en(pulse_en)
     );
 
+    assign pulse_o = 1'b0; // Not implemented yet
+    assign target_reset_o = 1'b0; // Not implemented yet
+
+    wire _unused = &{trigger_i, pulse_delay, pulse_width, num_pulses, pulse_spacing, pulse_en, 1'b0};
+
 endmodule
