@@ -46,15 +46,16 @@ module uart_handler #(
         .tx_busy_o(uart_tx_busy)
     );
 
-    reg [2:0] state;
-    localparam STATE_IDLE = 3'd0;
-    localparam STATE_SEND_ECHO = 3'd1;
-    localparam STATE_DELAY1 = 3'd2;
-    localparam STATE_DELAY0 = 3'd3;
-    localparam STATE_WIDTH = 3'd4;
-    localparam STATE_NUM_PULSES = 3'd5;
-    localparam STATE_PULSE_SPACING1 = 3'd6;
-    localparam STATE_PULSE_SPACING0 = 3'd7;
+    reg [3:0] state;
+    localparam STATE_IDLE = 4'd0;
+    localparam STATE_SEND_ECHO = 4'd1;
+    localparam STATE_DELAY1 = 4'd2;
+    localparam STATE_DELAY0 = 4'd3;
+    localparam STATE_WIDTH = 4'd4;
+    localparam STATE_NUM_PULSES = 4'd5;
+    localparam STATE_PULSE_SPACING1 = 4'd6;
+    localparam STATE_PULSE_SPACING0 = 4'd7;
+    localparam STATE_TRIGGER_PULSE = 4'd8;
 
     always @(posedge clk) begin
         if (rst) begin
@@ -70,6 +71,7 @@ module uart_handler #(
             state <= STATE_IDLE;
         end else begin
             uart_tx_en <= 1'b0;
+            pulse_en <= 1'b0;
 
             case(state)
                 STATE_IDLE:
@@ -79,6 +81,7 @@ module uart_handler #(
                             8'h01: state <= STATE_WIDTH;
                             8'h02: state <= STATE_NUM_PULSES;
                             8'h03: state <= STATE_PULSE_SPACING1;
+                            8'h04: state <= STATE_TRIGGER_PULSE;
                             default: 
                                 begin
                                     // Echo back the received byte for unrecognized commands
@@ -120,6 +123,12 @@ module uart_handler #(
                 STATE_PULSE_SPACING0:
                     if (uart_rx_valid) begin
                         pulse_spacing_o[7:0] <= uart_rx_data;
+                        state <= STATE_IDLE;
+                    end
+                STATE_TRIGGER_PULSE:
+                    begin
+                        // Set pulse_en high for one clock cycle
+                        pulse_en <= 1'b1;
                         state <= STATE_IDLE;
                     end
                 default:

@@ -1,6 +1,6 @@
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles
+from cocotb.triggers import ClockCycles, RisingEdge
 
 from cocotbext.uart import UartSink, UartSource
 
@@ -35,7 +35,7 @@ async def test_uart_handler_echo(dut):
         assert data == bytes([x]), f"Expected {x:#02x}, got {data[0]:#02x}"
 
 @cocotb.test()
-async def test_uart_set_delay(dut):
+async def test_uart_handler_set_delay(dut):
     dut._log.info("Start")
 
     # Set the clock period to 20 ns (50 MHz)
@@ -68,7 +68,7 @@ async def test_uart_set_delay(dut):
     assert dut.pulse_delay.value == 0xffff, f"Expected pulse_delay to be 0xffff, got {dut.pulse_delay.value}"
 
 @cocotb.test()
-async def test_uart_set_width(dut):
+async def test_uart_handler_set_width(dut):
     dut._log.info("Start")
 
     # Set the clock period to 20 ns (50 MHz)
@@ -101,7 +101,7 @@ async def test_uart_set_width(dut):
     assert dut.pulse_width.value == 0xff, f"Expected pulse_width to be 0xff, got {dut.pulse_width.value}"
 
 @cocotb.test()
-async def test_uart_set_num_pulses(dut):
+async def test_uart_handler_set_num_pulses(dut):
     dut._log.info("Start")
 
     # Set the clock period to 20 ns (50 MHz)
@@ -134,7 +134,7 @@ async def test_uart_set_num_pulses(dut):
     assert dut.num_pulses.value == 0xff, f"Expected num_pulses to be 0xff, got {dut.num_pulses.value}"
 
 @cocotb.test()
-async def test_uart_set_pulse_spacing(dut):
+async def test_uart_handler_set_pulse_spacing(dut):
     dut._log.info("Start")
 
     # Set the clock period to 20 ns (50 MHz)
@@ -165,3 +165,34 @@ async def test_uart_set_pulse_spacing(dut):
     await uart_source.write(b'\x03\xff\xff') # Set pulse spacing command (0x03), pulse spacing (0xffff)
     await uart_source.wait()
     assert dut.pulse_spacing.value == 0xffff, f"Expected pulse spacing to be 0xffff, got {dut.pulse_spacing.value}"
+
+@cocotb.test()
+async def test_uart_handler_trigger_pulse(dut):
+    dut._log.info("Start")
+
+    # Set the clock period to 20 ns (50 MHz)
+    clock = Clock(dut.clk, 20, unit="ns")
+    cocotb.start_soon(clock.start())
+
+    # Reset
+    dut._log.info("Reset")
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut._log.info("Test UART handler trigger pulse")
+
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+
+    assert dut.pulse_en.value == 0, "Expected pulse_en to be 0"
+
+    await uart_source.write(b'\x04') # Trigger pulse command (0x04)
+
+    await RisingEdge(dut.pulse_en)
+    await ClockCycles(dut.clk, 1)
+    assert dut.pulse_en.value == 1, "Expected pulse_en to be 1"
+    await ClockCycles(dut.clk, 1)
+    assert dut.pulse_en.value == 0, "Expected pulse_en to be 0"
