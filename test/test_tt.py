@@ -15,6 +15,10 @@ async def test_project_echo(dut):
     clock = Clock(dut.clk, 20, unit="ns")
     cocotb.start_soon(clock.start())
 
+    dut.ena.value = 1
+    dut.ui_in.value = 1
+    dut.uio_in.value = 0
+
     # Reset
     dut._log.info("Reset")
     dut.rst_n.value = 1

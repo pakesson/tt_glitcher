@@ -60,6 +60,8 @@ module uart_handler #(
 
             uart_tx_en <= 1'b0;
             uart_tx_data <= 8'd0;
+
+            state <= STATE_IDLE;
         end else begin
             uart_tx_en <= 1'b0;
 
