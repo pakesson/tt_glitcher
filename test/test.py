@@ -108,6 +108,7 @@ def test_glitch_control_runner():
 
     sources = [
         src_dir / "glitch_control.v",
+        src_dir / "pulser.v",
         src_dir / "uart_handler.v",
         src_dir / "uart_rx.v",
         src_dir / "uart_tx.v",
