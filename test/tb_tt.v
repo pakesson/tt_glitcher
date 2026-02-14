@@ -26,10 +26,13 @@ module tb_tt ();
     reg uart_rx;
     assign ui_in[7] = uart_rx;
 
-    reg trigger;
-    assign ui_in[6] = trigger;
+    reg trigger_in;
+    assign ui_in[6] = trigger_in;
 
     wire uart_tx = uo_out[0];
+    wire pulse_out = uo_out[1];
+    wire target_reset = uo_out[2];
+    wire pulse_en = uo_out[3];
 
     tt_um_pakesson_glitcher user_project (
         .ui_in  (ui_in),    // Dedicated inputs

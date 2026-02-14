@@ -10,7 +10,8 @@ module glitch_control #(
     output wire uart_tx_o,
     input wire trigger_i,
     output wire pulse_o,
-    output wire target_reset_o
+    output wire target_reset_o,
+    output wire pulse_en_o
 );
 
     wire [15:0] pulse_delay;
@@ -49,6 +50,8 @@ module glitch_control #(
     );
 
     assign target_reset_o = 1'b0; // Not implemented yet
+
+    assign pulse_en_o = pulse_en;
 
     wire _unused = &{trigger_i, pulse_delay, pulser_ready, 1'b0};
 
