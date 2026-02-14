@@ -19,7 +19,9 @@ module glitch_control #(
     wire [7:0]  pulse_width;
     wire [7:0]  num_pulses;
     wire [15:0] pulse_spacing;
-    wire        pulse_en;
+
+    wire        uart_pulse_en;
+    wire        pulse_en = uart_pulse_en | trigger_i;
 
 
     uart_handler #(
@@ -34,7 +36,7 @@ module glitch_control #(
         .width_o(pulse_width),
         .num_pulses_o(num_pulses),
         .pulse_spacing_o(pulse_spacing),
-        .pulse_en(pulse_en)
+        .pulse_en_o(uart_pulse_en)
     );
 
     pulser pulser_inst (

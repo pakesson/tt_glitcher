@@ -12,7 +12,7 @@ module uart_handler #(
     output reg [7:0]  width_o,
     output reg [7:0]  num_pulses_o,
     output reg [15:0] pulse_spacing_o,
-    output reg        pulse_en
+    output reg        pulse_en_o
 );
 
     wire uart_rx_valid;
@@ -63,7 +63,7 @@ module uart_handler #(
             width_o <= 8'd0;
             num_pulses_o <= 8'd0;
             pulse_spacing_o <= 16'd0;
-            pulse_en <= 1'b0;
+            pulse_en_o <= 1'b0;
 
             uart_tx_en <= 1'b0;
             uart_tx_data <= 8'd0;
@@ -71,7 +71,7 @@ module uart_handler #(
             state <= STATE_IDLE;
         end else begin
             uart_tx_en <= 1'b0;
-            pulse_en <= 1'b0;
+            pulse_en_o <= 1'b0;
 
             case(state)
                 STATE_IDLE:
@@ -128,7 +128,7 @@ module uart_handler #(
                 STATE_TRIGGER_PULSE:
                     begin
                         // Set pulse_en high for one clock cycle
-                        pulse_en <= 1'b1;
+                        pulse_en_o <= 1'b1;
                         state <= STATE_IDLE;
                     end
                 default:
