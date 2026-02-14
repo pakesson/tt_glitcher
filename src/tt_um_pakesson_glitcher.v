@@ -18,8 +18,8 @@ module tt_um_pakesson_glitcher (
 
     wire rst = ~rst_n;
 
-    wire uart_rx = ui_in[0];
-    wire trigger_in = ui_in[1];
+    wire uart_rx = ui_in[7];
+    wire trigger_in = ui_in[6];
 
     wire uart_tx;
     assign uo_out[0] = uart_tx;
@@ -48,6 +48,6 @@ module tt_um_pakesson_glitcher (
     assign uo_out[7:3] = 5'b0;
 
     // List all unused inputs to prevent warnings
-    wire _unused = &{ena, clk, ui_in[7:2], uio_in, 1'b0};
+    wire _unused = &{ena, clk, ui_in[5:0], uio_in, 1'b0};
 
 endmodule

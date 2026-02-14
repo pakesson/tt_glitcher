@@ -6,37 +6,40 @@
 */
 module tb_tt ();
 
-  // Dump the signals to a FST file. You can view it with gtkwave or surfer.
-  initial begin
-    $dumpfile("tb_tt.fst");
-    $dumpvars(0, tb_tt);
-    #1;
-  end
+    // Dump the signals to a FST file. You can view it with gtkwave or surfer.
+    initial begin
+        $dumpfile("tb_tt.fst");
+        $dumpvars(0, tb_tt);
+        #1;
+    end
 
-  // Wire up the inputs and outputs:
-  reg clk;
-  reg rst_n;
-  reg ena;
-  reg [7:0] ui_in;
-  reg [7:0] uio_in;
-  wire [7:0] uo_out;
-  wire [7:0] uio_out;
-  wire [7:0] uio_oe;
+    // Wire up the inputs and outputs:
+    reg clk;
+    reg rst_n;
+    reg ena;
+    reg [7:0] ui_in;
+    reg [7:0] uio_in;
+    wire [7:0] uo_out;
+    wire [7:0] uio_out;
+    wire [7:0] uio_oe;
 
-  reg uart_rx;
-  assign ui_in[0] = uart_rx;
+    reg uart_rx;
+    assign ui_in[7] = uart_rx;
 
-  wire uart_tx = uo_out[0];
+    reg trigger;
+    assign ui_in[6] = trigger;
 
-  tt_um_pakesson_glitcher user_project (
-      .ui_in  (ui_in),    // Dedicated inputs
-      .uo_out (uo_out),   // Dedicated outputs
-      .uio_in (uio_in),   // IOs: Input path
-      .uio_out(uio_out),  // IOs: Output path
-      .uio_oe (uio_oe),   // IOs: Enable path (active high: 0=input, 1=output)
-      .ena    (ena),      // enable - goes high when design is selected
-      .clk    (clk),      // clock
-      .rst_n  (rst_n)     // not reset
-  );
+    wire uart_tx = uo_out[0];
+
+    tt_um_pakesson_glitcher user_project (
+        .ui_in  (ui_in),    // Dedicated inputs
+        .uo_out (uo_out),   // Dedicated outputs
+        .uio_in (uio_in),   // IOs: Input path
+        .uio_out(uio_out),  // IOs: Output path
+        .uio_oe (uio_oe),   // IOs: Enable path (active high: 0=input, 1=output)
+        .ena    (ena),      // enable - goes high when design is selected
+        .clk    (clk),      // clock
+        .rst_n  (rst_n)     // not reset
+    );
 
 endmodule
