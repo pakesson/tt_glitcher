@@ -40,6 +40,7 @@ module glitch_control #(
         .rst(rst),
         .clk(clk),
         .en(pulse_en),
+        .delay_i(pulse_delay),
         .pulse_width_i(pulse_width),
         .num_pulses_i(num_pulses),
         .pulse_spacing_i(pulse_spacing),

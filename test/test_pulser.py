@@ -8,6 +8,7 @@ async def test_pulser_single_pulse(dut):
 
     # Initial values
     dut.pulse_en.value = 0
+    dut.delay.value = 0
     dut.pulse_width.value = 0
     dut.num_pulses.value = 0
     dut.pulse_spacing.value = 0
@@ -28,6 +29,7 @@ async def test_pulser_single_pulse(dut):
 
     dut._log.info("Test single pulse")
 
+    dut.delay.value = 20 # Delay of 20+1 clock cycles before the pulse starts
     dut.pulse_width.value = 5 # Pulse width of 5+1 clock cycles
     dut.num_pulses.value = 1
     dut.pulse_spacing.value = 0
@@ -36,6 +38,8 @@ async def test_pulser_single_pulse(dut):
     await ClockCycles(dut.clk, 1)
     dut.pulse_en.value = 0
     await ClockCycles(dut.clk, 1)
+
+    await ClockCycles(dut.clk, 21) # Delay of 20+1 clock cycles before the first pulse starts
 
     # Check that the output pulse is generated with the correct width
     for _ in range(6):
@@ -52,6 +56,7 @@ async def test_pulser_multiple_pulses(dut):
 
     # Initial values
     dut.pulse_en.value = 0
+    dut.delay.value = 0
     dut.pulse_width.value = 0
     dut.num_pulses.value = 0
     dut.pulse_spacing.value = 0
@@ -72,6 +77,7 @@ async def test_pulser_multiple_pulses(dut):
 
     dut._log.info("Test multiple pulses")
 
+    dut.delay.value = 20 # Delay of 20+1 clock cycles before the first pulse starts
     dut.pulse_width.value = 5 # Pulse width of 5+1 clock cycles
     dut.num_pulses.value = 3
     dut.pulse_spacing.value = 10 # Spacing of 10+1 clock cycles
@@ -80,6 +86,8 @@ async def test_pulser_multiple_pulses(dut):
     await ClockCycles(dut.clk, 1)
     dut.pulse_en.value = 0
     await ClockCycles(dut.clk, 1)
+
+    await ClockCycles(dut.clk, 21) # Delay of 20+1 clock cycles before the first pulse starts
 
     for x in range(3):
         for _ in range(6):
