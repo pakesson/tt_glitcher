@@ -8,13 +8,13 @@ PDK_ROOT = Path(os.getenv("PDK_ROOT"))
 def test_project_runner():
     sim = os.getenv("SIM", "icarus")
     waves = os.getenv("WAVES", 1)
-    gl_test = os.getenv("GATES", False)
+    gl_test = os.getenv("GATES", False) in ["yes", "1", "true", True]
 
     test_dir = Path(__file__).resolve().parent
     src_dir = test_dir.parent / "src"
 
     sources = []
-    if gl_test == "yes" or gl_test == "1" or gl_test == "true":
+    if gl_test:
         sources += [test_dir / "gate_level_netlist.v"]
         sources += [PDK_ROOT / "ihp-sg13g2/libs.ref/sg13g2_io/verilog/sg13g2_io.v"]
         sources += [PDK_ROOT / "ihp-sg13g2/libs.ref/sg13g2_stdcell/verilog/sg13g2_stdcell.v"]
