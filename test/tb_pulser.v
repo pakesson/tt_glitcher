@@ -19,7 +19,7 @@ module tb_pulser ();
     reg [15:0] pulse_spacing;
 
     wire pulse_out;
-    wire ready;
+    wire busy;
 
     pulser pulseri (
         .rst(rst),
@@ -30,6 +30,6 @@ module tb_pulser ();
         .num_pulses_i(num_pulses),
         .pulse_spacing_i(pulse_spacing),
         .pulse_o(pulse_out),
-        .ready_o(ready)
+        .busy_o(busy)
     );
 endmodule

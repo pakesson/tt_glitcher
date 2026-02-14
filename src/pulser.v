@@ -8,7 +8,7 @@ module pulser
     input wire [7:0]    num_pulses_i,
     input wire [15:0]   pulse_spacing_i,
     output reg          pulse_o,
-    output reg          ready_o
+    output reg          busy_o
 );
 
 reg [2:0] state;
@@ -25,7 +25,7 @@ reg [15:0] spacing_cnt;
 always @(posedge clk) begin
     if (rst) begin
         pulse_o <= 1'b0;
-        ready_o <= 1'b1;
+        busy_o <= 1'b0;
         state <= PULSE_IDLE;
         delay_cnt <= 16'b0;
         width_cnt <= 8'b0;
@@ -41,10 +41,10 @@ always @(posedge clk) begin
         case (state)
             PULSE_IDLE:
                 begin
-                    ready_o <= 1'b1;
+                    busy_o <= 1'b0;
                     if (en) begin
                         state <= PULSE_DELAY;
-                        ready_o <= 1'b0;
+                        busy_o <= 1'b1;
                         delay_cnt <= 16'b0;
                     end
                 end
@@ -63,6 +63,7 @@ always @(posedge clk) begin
                     if (width_cnt == pulse_width_i) begin
                         state <= PULSE_IDLE;
                         pulse_o <= 1'b0;
+                        busy_o <= 1'b0;
 
                         if (pulse_cnt > 1) begin
                             state <= PULSE_SPACE;

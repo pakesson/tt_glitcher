@@ -48,7 +48,7 @@ async def test_pulser_single_pulse(dut):
 
     assert dut.pulse_out.value == 0
     await ClockCycles(dut.clk, 1)
-    assert dut.ready.value == 1
+    assert dut.busy.value == 0
 
 @cocotb.test()
 async def test_pulser_multiple_pulses(dut):
@@ -100,4 +100,4 @@ async def test_pulser_multiple_pulses(dut):
 
     assert dut.pulse_out.value == 0
     await ClockCycles(dut.clk, 1)
-    assert dut.ready.value == 1
+    assert dut.busy.value == 0

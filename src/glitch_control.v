@@ -11,7 +11,8 @@ module glitch_control #(
     input wire trigger_i,
     output wire pulse_o,
     output wire target_reset_o,
-    output wire pulse_en_o
+    output wire pulse_en_o,
+    output wire busy_o
 );
 
     wire [15:0] pulse_delay;
@@ -20,7 +21,6 @@ module glitch_control #(
     wire [15:0] pulse_spacing;
     wire        pulse_en;
 
-    wire        pulser_ready;
 
     uart_handler #(
         .CLK_FREQ(CLK_FREQ),
@@ -46,13 +46,13 @@ module glitch_control #(
         .num_pulses_i(num_pulses),
         .pulse_spacing_i(pulse_spacing),
         .pulse_o(pulse_o),
-        .ready_o(pulser_ready)
+        .busy_o(busy_o)
     );
 
     assign target_reset_o = 1'b0; // Not implemented yet
 
     assign pulse_en_o = pulse_en;
 
-    wire _unused = &{trigger_i, pulse_delay, pulser_ready, 1'b0};
+    wire _unused = &{trigger_i, 1'b0};
 
 endmodule
