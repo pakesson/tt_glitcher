@@ -56,6 +56,9 @@ module uart_handler #(
     localparam STATE_PULSE_SPACING1 = 4'd6;
     localparam STATE_PULSE_SPACING0 = 4'd7;
     localparam STATE_TRIGGER_PULSE = 4'd8;
+    localparam STATE_SEND_HELLO = 4'd9;
+
+    reg [2:0] hello_state;
 
     always @(posedge clk) begin
         if (rst) begin
@@ -69,6 +72,7 @@ module uart_handler #(
             uart_tx_data <= 8'd0;
 
             state <= STATE_IDLE;
+            hello_state <= 3'd0;
         end else begin
             uart_tx_en <= 1'b0;
             pulse_en_o <= 1'b0;
@@ -82,6 +86,7 @@ module uart_handler #(
                             8'h02: state <= STATE_NUM_PULSES;
                             8'h03: state <= STATE_PULSE_SPACING1;
                             8'h04: state <= STATE_TRIGGER_PULSE;
+                            8'h68: state <= STATE_SEND_HELLO;
                             default: 
                                 begin
                                     // Echo back the received byte for unrecognized commands
@@ -130,6 +135,47 @@ module uart_handler #(
                         // Set pulse_en high for one clock cycle
                         pulse_en_o <= 1'b1;
                         state <= STATE_IDLE;
+                    end
+                STATE_SEND_HELLO:
+                    if (uart_tx_rdy && !uart_tx_en) begin
+                        case (hello_state)
+                            3'd0: begin
+                                uart_tx_data <= 8'h48;
+                                uart_tx_en <= 1'b1;
+                                hello_state <= 3'd1;
+                            end
+                            3'd1: begin
+                                uart_tx_data <= 8'h65;
+                                uart_tx_en <= 1'b1;
+                                hello_state <= 3'd2;
+                            end
+                            3'd2: begin
+                                uart_tx_data <= 8'h6C;
+                                uart_tx_en <= 1'b1;
+                                hello_state <= 3'd3;
+                            end
+                            3'd3: begin
+                                uart_tx_data <= 8'h6C;
+                                uart_tx_en <= 1'b1;
+                                hello_state <= 3'd4;
+                            end
+                            3'd4: begin
+                                uart_tx_data <= 8'h6F;
+                                uart_tx_en <= 1'b1;
+                                hello_state <= 3'd5;
+                            end
+                            3'd5: begin
+                                uart_tx_data <= 8'h0A;
+                                uart_tx_en <= 1'b1;
+                                hello_state <= 3'd0;
+                                state <= STATE_IDLE;
+                            end
+                            default:
+                                begin
+                                    hello_state <= 3'd0;
+                                    state <= STATE_IDLE;
+                                end
+                        endcase
                     end
                 default:
                     state <= STATE_IDLE;

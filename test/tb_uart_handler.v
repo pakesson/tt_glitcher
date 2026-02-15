@@ -35,7 +35,7 @@ module tb_uart_handler ();
         .width_o(pulse_width),
         .num_pulses_o(num_pulses),
         .pulse_spacing_o(pulse_spacing),
-        .pulse_en(pulse_en)
+        .pulse_en_o(pulse_en)
     );
 
 endmodule
