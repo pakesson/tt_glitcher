@@ -3,7 +3,7 @@ project:
   title:        "Glitcher"      # Project title
   author:       "Philip Åkesson"      # Your name
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "Pulse generator"      # One line description of what your project does
+  description:  "Pulse generator with trigger input and configurable parameters"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     50000000       # Clock frequency in Hz (or 0 if not applicable)
 
@@ -30,7 +30,7 @@ project:
 pinout:
   # Inputs
   ui[0]: ""
-  ui[1]: "Glitch Trigger"
+  ui[1]: "Trigger Input"
   ui[2]: ""
   ui[3]: ""
   ui[4]: ""
@@ -40,7 +40,7 @@ pinout:
 
   # Outputs
   uo[0]: "UART TX"
-  uo[1]: "Glitch Out"
+  uo[1]: "Pulse Out"
   uo[2]: "Target Reset"
   uo[3]: ""
   uo[4]: ""

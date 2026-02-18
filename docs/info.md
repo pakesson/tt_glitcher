@@ -9,12 +9,31 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-Explain how your project works
+This project is a pulse generator with configurable parameters, intended for use in voltage or electromagnetic fault injection attacks.
+
+The pulse generator can be configured and controlled over UART (115200 8N1).
+
+Pulses can be triggered either over UART or using the trigger input signal.
+
+**Commands**
+
+All parameter values are either 16-bit or 8-bit unsigned integers.
+
+- Set delay: 0x64 (`d`) followed by the high byte and the low byte of the 16-bit delay value
+- Set width: 0x77 (`w`) followed by the 8-bit width value
+- Set number of pulses: 0x6e (`n`) followed by the 8-bit number of pulses
+- Set pulse spacing: 0x73 (`s`) followed by the high byte and the low byte of the 16-bit pulse spacing value
+- Trigger pulse: 0x74 (`t`)
+    - Triggers a pulse immediately (after the configured delay)
+- Hello: 0x68 (`h`)
+    - Transmits `Hello\n` over UART
+
+Unhandled command bytes are echoed back over UART.
 
 ## How to test
 
-Explain how to use your project
+TODO: Explain how to use the project
 
 ## External hardware
 
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+The pulse output can be used with a MOSFET or analog mux for voltage fault injection, or connected to a ChipSHOUTER for EMFI.
