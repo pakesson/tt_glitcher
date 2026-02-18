@@ -1,14 +1,20 @@
 # Tests
 
+## Prerequisites
+
+```sh
+pip install -r requirements.txt
+```
+
 ## How to run
 
 ### Python
 
-Tests can be run either directly with `python`:
+While tests can be run directly with `python`:
 ```sh
 python test.py            # Run all tests with cocotb runners
 ```
-or using `pytest` for more control:
+using `pytest` gives more control:
 ```sh
 pytest test.py                              # Run all tests through pytest
 pytest test.py -s                           # Show details
@@ -20,10 +26,6 @@ To run gatelevel simulation, first harden the project and copy `../ runs/wokwi/f
 Then run
 ```sh
 GATES=yes pytest test.py  # Gate level tests, only runs (top level) project tests
-```
-or
-```sh
-GATES=yes python test.py  # Gate level tests, only runs (top level) project tests
 ```
 
 ### Makefile
