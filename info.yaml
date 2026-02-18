@@ -30,20 +30,20 @@ project:
 pinout:
   # Inputs
   ui[0]: ""
-  ui[1]: "Trigger Input"
+  ui[1]: ""
   ui[2]: ""
   ui[3]: ""
   ui[4]: ""
   ui[5]: ""
-  ui[6]: ""
+  ui[6]: "Trigger Input"
   ui[7]: "UART RX"
 
   # Outputs
   uo[0]: "UART TX"
   uo[1]: "Pulse Out"
   uo[2]: "Target Reset"
-  uo[3]: ""
-  uo[4]: ""
+  uo[3]: "Pulse EN"
+  uo[4]: "Busy"
   uo[5]: ""
   uo[6]: ""
   uo[7]: ""
