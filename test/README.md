@@ -1,14 +1,34 @@
-# Sample testbench for a Tiny Tapeout project
-
-This is a sample testbench for a Tiny Tapeout project. It uses [cocotb](https://docs.cocotb.org/en/stable/) to drive the DUT and check the outputs.
-See below to get started or for more information, check the [website](https://tinytapeout.com/hdl/testing/).
-
-## Setting up
-
-1. Edit [Makefile](Makefile) and modify `PROJECT_SOURCES` to point to your Verilog files.
-2. Edit [tb.v](tb.v) and replace `tt_um_example` with your module name.
+# Tests
 
 ## How to run
+
+### Python
+
+Tests can be run either directly with `python`:
+```sh
+python test.py            # Run all tests with cocotb runners
+```
+or using `pytest` for more control:
+```sh
+pytest test.py                              # Run all tests through pytest
+pytest test.py -s                           # Show details
+pytest test.py -k "uart_handler_runner"     # Only run matching tests
+pytest test.py -k "uart_handler_runner" -s  # Only run matching tests w/ details
+```
+
+To run gatelevel simulation, first harden the project and copy `../ runs/wokwi/final/nl/tt_um_pakesson_glitcher.nl.v` to `gate_level_netlist.v`.
+Then run
+```sh
+GATES=yes pytest test.py  # Gate level tests, only runs (top level) project tests
+```
+or
+```sh
+GATES=yes python test.py  # Gate level tests, only runs (top level) project tests
+```
+
+### Makefile
+
+It is also possible to run top-level tests using the provided makefile.
 
 To run the RTL simulation:
 
@@ -16,32 +36,10 @@ To run the RTL simulation:
 make -B
 ```
 
-To run gatelevel simulation, first harden your project and copy `../runs/wokwi/results/final/verilog/gl/{your_module_name}.v` to `gate_level_netlist.v`.
+To run gatelevel simulation, first harden the project and copy `../ runs/wokwi/final/nl/tt_um_pakesson_glitcher.nl.v` to `gate_level_netlist.v`.
 
 Then run:
 
 ```sh
 make -B GATES=yes
-```
-
-If you wish to save the waveform in VCD format instead of FST format, edit tb.v to use `$dumpfile("tb.vcd");` and then run:
-
-```sh
-make -B FST=
-```
-
-This will generate `tb.vcd` instead of `tb.fst`.
-
-## How to view the waveform file
-
-Using GTKWave
-
-```sh
-gtkwave tb.fst tb.gtkw
-```
-
-Using Surfer
-
-```sh
-surfer tb.fst
 ```
