@@ -96,15 +96,15 @@ async def test_uart_handler_set_delay(dut):
 
     uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
 
-    await uart_source.write(b'\x00\x12\x34') # Set delay command (0x00), high byte of delay (0x12), low byte of delay (0x34)
+    await uart_source.write(b'd\x12\x34') # Set delay command (d, 0x64), high byte of delay (0x12), low byte of delay (0x34)
     await uart_source.wait()
     assert dut.pulse_delay.value == 0x1234, f"Expected pulse_delay to be 0x1234, got {dut.pulse_delay.value}"
 
-    await uart_source.write(b'\x00\x00\x00') # Set delay command (0x00), high byte of delay (0x00), low byte of delay (0x00)
+    await uart_source.write(b'd\x00\x00') # Set delay command (d, 0x64), high byte of delay (0x00), low byte of delay (0x00)
     await uart_source.wait()
     assert dut.pulse_delay.value == 0x0000, f"Expected pulse_delay to be 0x0000, got {dut.pulse_delay.value}"
 
-    await uart_source.write(b'\x00\xff\xff') # Set delay command (0x00), high byte of delay (0xff), low byte of delay (0xff)
+    await uart_source.write(b'd\xff\xff') # Set delay command (d, 0x64), high byte of delay (0xff), low byte of delay (0xff)
     await uart_source.wait()
     assert dut.pulse_delay.value == 0xffff, f"Expected pulse_delay to be 0xffff, got {dut.pulse_delay.value}"
 
@@ -129,15 +129,15 @@ async def test_uart_handler_set_width(dut):
 
     uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
 
-    await uart_source.write(b'\x01\x12') # Set width command (0x01), width (0x12)
+    await uart_source.write(b'w\x12') # Set width command (w, 0x77), width (0x12)
     await uart_source.wait()
     assert dut.pulse_width.value == 0x12, f"Expected pulse_width to be 0x12, got {dut.pulse_width.value}"
 
-    await uart_source.write(b'\x01\x00') # Set width command (0x01), width (0x00)
+    await uart_source.write(b'w\x00') # Set width command (w, 0x77), width (0x00)
     await uart_source.wait()
     assert dut.pulse_width.value == 0x00, f"Expected pulse_width to be 0x00, got {dut.pulse_width.value}"
 
-    await uart_source.write(b'\x01\xff') # Set width command (0x01), width (0xff)
+    await uart_source.write(b'w\xff') # Set width command (w, 0x77), width (0xff)
     await uart_source.wait()
     assert dut.pulse_width.value == 0xff, f"Expected pulse_width to be 0xff, got {dut.pulse_width.value}"
 
@@ -162,15 +162,15 @@ async def test_uart_handler_set_num_pulses(dut):
 
     uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
 
-    await uart_source.write(b'\x02\x12') # Set num pulses command (0x02), num pulses (0x12)
+    await uart_source.write(b'n\x12') # Set num pulses command (n, 0x6e), num pulses (0x12)
     await uart_source.wait()
     assert dut.num_pulses.value == 0x12, f"Expected num_pulses to be 0x12, got {dut.num_pulses.value}"
 
-    await uart_source.write(b'\x02\x00') # Set num pulses command (0x02), num pulses (0x00)
+    await uart_source.write(b'n\x00') # Set num pulses command (n, 0x6e), num pulses (0x00)
     await uart_source.wait()
     assert dut.num_pulses.value == 0x00, f"Expected num_pulses to be 0x00, got {dut.num_pulses.value}"
 
-    await uart_source.write(b'\x02\xff') # Set num pulses command (0x02), num pulses (0xff)
+    await uart_source.write(b'n\xff') # Set num pulses command (n, 0x6e), num pulses (0xff)
     await uart_source.wait()
     assert dut.num_pulses.value == 0xff, f"Expected num_pulses to be 0xff, got {dut.num_pulses.value}"
 
@@ -195,15 +195,15 @@ async def test_uart_handler_set_pulse_spacing(dut):
 
     uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
 
-    await uart_source.write(b'\x03\x12\x34') # Set pulse spacing command (0x03), pulse spacing (0x1234)
+    await uart_source.write(b's\x12\x34') # Set pulse spacing command (s, 0x73), pulse spacing (0x1234)
     await uart_source.wait()
     assert dut.pulse_spacing.value == 0x1234, f"Expected pulse spacing to be 0x1234, got {dut.pulse_spacing.value}"
 
-    await uart_source.write(b'\x03\x00\x00') # Set pulse spacing command (0x03), pulse spacing (0x0000)
+    await uart_source.write(b's\x00\x00') # Set pulse spacing command (s, 0x73), pulse spacing (0x0000)
     await uart_source.wait()
     assert dut.pulse_spacing.value == 0x0000, f"Expected pulse spacing to be 0x0000, got {dut.pulse_spacing.value}"
 
-    await uart_source.write(b'\x03\xff\xff') # Set pulse spacing command (0x03), pulse spacing (0xffff)
+    await uart_source.write(b's\xff\xff') # Set pulse spacing command (s, 0x73), pulse spacing (0xffff)
     await uart_source.wait()
     assert dut.pulse_spacing.value == 0xffff, f"Expected pulse spacing to be 0xffff, got {dut.pulse_spacing.value}"
 
@@ -230,7 +230,7 @@ async def test_uart_handler_trigger_pulse(dut):
 
     assert dut.pulse_en.value == 0, "Expected pulse_en to be 0"
 
-    await uart_source.write(b'\x04') # Trigger pulse command (0x04)
+    await uart_source.write(b't') # Trigger pulse command (t, 0x74)
 
     await RisingEdge(dut.pulse_en)
     await ClockCycles(dut.clk, 1)

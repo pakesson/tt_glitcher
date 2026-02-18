@@ -81,12 +81,12 @@ module uart_handler #(
                 STATE_IDLE:
                     if (uart_rx_valid) begin
                         case (uart_rx_data)
-                            8'h00: state <= STATE_DELAY1;
-                            8'h01: state <= STATE_WIDTH;
-                            8'h02: state <= STATE_NUM_PULSES;
-                            8'h03: state <= STATE_PULSE_SPACING1;
-                            8'h04: state <= STATE_TRIGGER_PULSE;
-                            8'h68: state <= STATE_SEND_HELLO;
+                            8'h64: state <= STATE_DELAY1;         // 'd'
+                            8'h77: state <= STATE_WIDTH;          // 'w'
+                            8'h6E: state <= STATE_NUM_PULSES;     // 'n'
+                            8'h73: state <= STATE_PULSE_SPACING1; // 's'
+                            8'h74: state <= STATE_TRIGGER_PULSE;  // 't'
+                            8'h68: state <= STATE_SEND_HELLO;     // 'h'
                             default: 
                                 begin
                                     // Echo back the received byte for unrecognized commands

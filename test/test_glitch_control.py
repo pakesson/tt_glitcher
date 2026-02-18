@@ -102,11 +102,11 @@ async def test_glitch_control_full_glitch_sequence(dut):
 
     uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
 
-    await uart_source.write(b'\x00\x00\x12') # Set delay
-    await uart_source.write(b'\x01\x01')     # Set width
-    await uart_source.write(b'\x02\x02')     # Set num pulses
-    await uart_source.write(b'\x03\x00\x03') # Set pulse spacing
-    await uart_source.write(b'\x04')         # Trigger pulse
+    await uart_source.write(b'd\x00\x12') # Set delay
+    await uart_source.write(b'w\x01')     # Set width
+    await uart_source.write(b'n\x02')     # Set num pulses
+    await uart_source.write(b's\x00\x03') # Set pulse spacing
+    await uart_source.write(b't')         # Trigger pulse
 
     await RisingEdge(dut.glitch_ctrl.pulse_en)
     await ClockCycles(dut.clk, 1)
@@ -154,10 +154,10 @@ async def test_glitch_control_trigger(dut):
 
     uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
 
-    await uart_source.write(b'\x00\x00\x12') # Set delay
-    await uart_source.write(b'\x01\x01')     # Set width
-    await uart_source.write(b'\x02\x02')     # Set num pulses
-    await uart_source.write(b'\x03\x00\x03') # Set pulse spacing
+    await uart_source.write(b'd\x00\x12') # Set delay
+    await uart_source.write(b'w\x01')     # Set width
+    await uart_source.write(b'n\x02')     # Set num pulses
+    await uart_source.write(b's\x00\x03') # Set pulse spacing
     await uart_source.wait()
 
     dut.trigger_in.value = 1
