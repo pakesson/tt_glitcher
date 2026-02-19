@@ -18,6 +18,7 @@ Pulses can be triggered either over UART or using the trigger input signal.
 **Commands**
 
 All parameter values are either 16-bit or 8-bit unsigned integers.
+Timing-related values are specified in number of clock cycles.
 
 - Set delay: 0x64 (`d`) followed by the high byte and the low byte of the 16-bit delay value
 - Set width: 0x77 (`w`) followed by the 8-bit width value
@@ -36,4 +37,4 @@ TODO: Explain how to use the project
 
 ## External hardware
 
-The pulse output can be used with a MOSFET or analog mux for voltage fault injection, or connected to a ChipSHOUTER for EMFI.
+The pulse output can be used with a MOSFET or analog multiplexer/switch for voltage fault injection, or connected to a ChipSHOUTER for EMFI.

@@ -1,3 +1,3 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-Pulse generator with trigger input and configurable parameters.
+Pulse generator with trigger input and configurable parameters, controllable over UART.
