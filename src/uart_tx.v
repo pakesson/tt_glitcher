@@ -25,7 +25,7 @@ reg [7:0] data;
 reg [2:0] bit_cnt;
 reg [CLK_CNT_WIDTH-1:0] clk_cnt;
 
-wire tx_strobe = (clk_cnt == CLKS_PER_BIT);
+wire tx_strobe = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_BIT));
 
 always @(posedge clk) begin
     if (rst) begin

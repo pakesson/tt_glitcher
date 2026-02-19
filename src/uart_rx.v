@@ -23,8 +23,8 @@ localparam UART_STOP = 2'd2;
 reg [2:0] bit_cnt;
 reg [CLK_CNT_WIDTH-1:0] clk_cnt;
 
-wire rx_strobe = (clk_cnt == CLKS_PER_BIT);
-wire rx_strobe_half = (clk_cnt == CLKS_PER_HALF_BIT);
+wire rx_strobe = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_BIT));
+wire rx_strobe_half = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_HALF_BIT));
 
 always @(posedge clk) begin
     if (rst) begin
