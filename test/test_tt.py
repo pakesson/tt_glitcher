@@ -14,6 +14,7 @@ async def test_project_full_glitch_sequence(dut):
 
     # Initial values
     dut.trigger_in.value = 0
+    dut.uart_rx.value = 1
 
     # Reset
     dut._log.info("Reset")
