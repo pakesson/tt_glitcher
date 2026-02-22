@@ -14,7 +14,8 @@ module uart_handler #(
     output reg [15:0] pulse_spacing_o,
     output reg        pulse_en_o,
     output reg        reset_en_o,
-    output reg [15:0] reset_length_o
+    output reg [15:0] reset_length_o,
+    output reg        arm_o
 );
 
     wire uart_rx_valid;
@@ -69,7 +70,7 @@ module uart_handler #(
             pulse_en_o <= 1'b0;
             reset_en_o <= 1'b0;
             reset_length_o <= 16'd0;
-
+            arm_o <= 1'b0;
             uart_tx_en <= 1'b0;
             uart_tx_data <= 8'd0;
 
@@ -78,6 +79,7 @@ module uart_handler #(
             uart_tx_en <= 1'b0;
             pulse_en_o <= 1'b0;
             reset_en_o <= 1'b0;
+            arm_o <= 1'b0;
 
             case(state)
                 STATE_IDLE:
@@ -89,6 +91,7 @@ module uart_handler #(
                             8'h73: state <= STATE_PULSE_SPACING1; // 's'
                             8'h72: state <= STATE_RESET_LENGTH1;  // 'r'
                             8'h74: state <= STATE_TRIGGER_PULSE;  // 't'
+                            8'h61: arm_o <= 1'b1;                 // 'a'
                             default: 
                                 state <= STATE_IDLE;
                         endcase

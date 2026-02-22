@@ -148,6 +148,7 @@ async def test_project_trigger(dut):
     await uart_source.write(b'w\x01')     # Set width
     await uart_source.write(b'n\x02')     # Set num pulses
     await uart_source.write(b's\x00\x03') # Set pulse spacing
+    await uart_source.write(b'a')         # Arm
     await uart_source.wait()
 
     await ClockCycles(dut.clk, 1)

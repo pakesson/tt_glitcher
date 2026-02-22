@@ -24,7 +24,11 @@ module glitch_control #(
     wire        uart_pulse_en;
     wire        uart_reset_en;
     wire        reset_done;
-    wire        pulse_en = uart_pulse_en | trigger_i | reset_done;
+
+    wire        arm_signal;
+    reg         armed;
+
+    wire        pulse_en = uart_pulse_en | (armed && trigger_i) | reset_done;
 
 
     uart_handler #(
@@ -41,7 +45,8 @@ module glitch_control #(
         .pulse_spacing_o(pulse_spacing),
         .pulse_en_o(uart_pulse_en),
         .reset_en_o(uart_reset_en),
-        .reset_length_o(reset_length)
+        .reset_length_o(reset_length),
+        .arm_o(arm_signal)
     );
 
     resetter resetter_inst (
@@ -70,5 +75,16 @@ module glitch_control #(
     assign pulse_o = pulser_pulse | target_reset_o;
 
     assign pulse_en_o = pulse_en;
+
+    always @(posedge clk) begin
+        if (rst) begin
+            armed <= 1'b0;
+        end else begin
+            if (arm_signal)
+                armed <= 1'b1;
+            else if (pulse_en)
+                armed <= 1'b0;
+        end
+    end
 
 endmodule
