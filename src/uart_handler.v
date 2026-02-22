@@ -12,7 +12,9 @@ module uart_handler #(
     output reg [7:0]  width_o,
     output reg [7:0]  num_pulses_o,
     output reg [15:0] pulse_spacing_o,
-    output reg        pulse_en_o
+    output reg        pulse_en_o,
+    output reg        reset_en_o,
+    output reg [15:0] reset_length_o
 );
 
     wire uart_rx_valid;
@@ -55,8 +57,10 @@ module uart_handler #(
     localparam STATE_NUM_PULSES = 4'd5;
     localparam STATE_PULSE_SPACING1 = 4'd6;
     localparam STATE_PULSE_SPACING0 = 4'd7;
-    localparam STATE_TRIGGER_PULSE = 4'd8;
-    localparam STATE_SEND_HELLO = 4'd9;
+    localparam STATE_RESET_LENGTH1 = 4'd8;
+    localparam STATE_RESET_LENGTH0 = 4'd9;
+    localparam STATE_TRIGGER_PULSE = 4'd10;
+    localparam STATE_SEND_HELLO = 4'd11;
 
     reg [2:0] hello_state;
 
@@ -67,6 +71,8 @@ module uart_handler #(
             num_pulses_o <= 8'd0;
             pulse_spacing_o <= 16'd0;
             pulse_en_o <= 1'b0;
+            reset_en_o <= 1'b0;
+            reset_length_o <= 16'd0;
 
             uart_tx_en <= 1'b0;
             uart_tx_data <= 8'd0;
@@ -76,6 +82,7 @@ module uart_handler #(
         end else begin
             uart_tx_en <= 1'b0;
             pulse_en_o <= 1'b0;
+            reset_en_o <= 1'b0;
 
             case(state)
                 STATE_IDLE:
@@ -85,6 +92,7 @@ module uart_handler #(
                             8'h77: state <= STATE_WIDTH;          // 'w'
                             8'h6E: state <= STATE_NUM_PULSES;     // 'n'
                             8'h73: state <= STATE_PULSE_SPACING1; // 's'
+                            8'h72: state <= STATE_RESET_LENGTH1;  // 'r'
                             8'h74: state <= STATE_TRIGGER_PULSE;  // 't'
                             8'h68: state <= STATE_SEND_HELLO;     // 'h'
                             default: 
@@ -130,10 +138,24 @@ module uart_handler #(
                         pulse_spacing_o[7:0] <= uart_rx_data;
                         state <= STATE_IDLE;
                     end
+                STATE_RESET_LENGTH1:
+                    if (uart_rx_valid) begin
+                        reset_length_o[15:8] <= uart_rx_data;
+                        state <= STATE_RESET_LENGTH0;
+                    end
+                STATE_RESET_LENGTH0:
+                    if (uart_rx_valid) begin
+                        reset_length_o[7:0] <= uart_rx_data;
+                        state <= STATE_IDLE;
+                    end
                 STATE_TRIGGER_PULSE:
                     begin
-                        // Set pulse_en high for one clock cycle
-                        pulse_en_o <= 1'b1;
+                        if (reset_length_o != 16'd0)
+                            // Set reset_en high for one clock cycle
+                            reset_en_o <= 1'b1;
+                        else
+                            // Set pulse_en high for one clock cycle
+                            pulse_en_o <= 1'b1;
                         state <= STATE_IDLE;
                     end
                 STATE_SEND_HELLO:

@@ -19,9 +19,12 @@ module glitch_control #(
     wire [7:0]  pulse_width;
     wire [7:0]  num_pulses;
     wire [15:0] pulse_spacing;
+    wire [15:0] reset_length;
 
     wire        uart_pulse_en;
-    wire        pulse_en = uart_pulse_en | trigger_i;
+    wire        uart_reset_en;
+    wire        reset_done;
+    wire        pulse_en = uart_pulse_en | trigger_i | reset_done;
 
 
     uart_handler #(
@@ -36,8 +39,21 @@ module glitch_control #(
         .width_o(pulse_width),
         .num_pulses_o(num_pulses),
         .pulse_spacing_o(pulse_spacing),
-        .pulse_en_o(uart_pulse_en)
+        .pulse_en_o(uart_pulse_en),
+        .reset_en_o(uart_reset_en),
+        .reset_length_o(reset_length)
     );
+
+    resetter resetter_inst (
+        .rst(rst),
+        .clk(clk),
+        .en(uart_reset_en),
+        .reset_length_i(reset_length),
+        .reset_o(target_reset_o),
+        .reset_done_o(reset_done)
+    );
+
+    wire pulser_pulse;
 
     pulser pulser_inst (
         .rst(rst),
@@ -47,14 +63,12 @@ module glitch_control #(
         .pulse_width_i(pulse_width),
         .num_pulses_i(num_pulses),
         .pulse_spacing_i(pulse_spacing),
-        .pulse_o(pulse_o),
+        .pulse_o(pulser_pulse),
         .busy_o(busy_o)
     );
 
-    assign target_reset_o = 1'b0; // Not implemented yet
+    assign pulse_o = pulser_pulse | target_reset_o;
 
     assign pulse_en_o = pulse_en;
-
-    wire _unused = &{trigger_i, 1'b0};
 
 endmodule

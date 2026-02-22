@@ -21,7 +21,15 @@ def test_project_runner():
         sources += [PDK_ROOT / "ihp-sg13g2/libs.ref/sg13g2_stdcell/verilog/sg13g2_stdcell.v"]
 
     else:
-        sources += list(src_dir.glob("*.v"))
+        sources += [
+            src_dir / "tt_um_pakesson_glitcher.v",
+            src_dir / "glitch_control.v",
+            src_dir / "resetter.v",
+            src_dir / "pulser.v",
+            src_dir / "uart_handler.v",
+            src_dir / "uart_rx.v",
+            src_dir / "uart_tx.v"
+        ]
 
     sources += [test_dir / "tb_tt.v"]
 
@@ -101,6 +109,7 @@ def test_glitch_control_runner():
 
     sources = [
         src_dir / "glitch_control.v",
+        src_dir / "resetter.v",
         src_dir / "pulser.v",
         src_dir / "uart_handler.v",
         src_dir / "uart_rx.v",
