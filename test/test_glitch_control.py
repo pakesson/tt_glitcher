@@ -160,6 +160,8 @@ async def test_glitch_control_trigger(dut):
     await uart_source.write(b's\x00\x03') # Set pulse spacing
     await uart_source.wait()
 
+    await ClockCycles(dut.clk, 1)
+
     dut.trigger_in.value = 1
     await ClockCycles(dut.clk, 1)
     dut.trigger_in.value = 0
