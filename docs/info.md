@@ -24,12 +24,12 @@ Timing-related values are specified in number of clock cycles.
 - Set width: 0x77 (`w`) followed by the 8-bit width value
 - Set number of pulses: 0x6e (`n`) followed by the 8-bit number of pulses
 - Set pulse spacing: 0x73 (`s`) followed by the high byte and the low byte of the 16-bit pulse spacing value
+- Target reset length: 0x72 (`r`) followed by the high byte and the low byte of the 16-bit target reset length value
+    - Setting this to 0 disables target reset
 - Trigger pulse: 0x74 (`t`)
     - Triggers a pulse immediately (after the configured delay)
-- Hello: 0x68 (`h`)
-    - Transmits `Hello\n` over UART
+- Arm trigger: 0x61 (`a`)
 
-Unhandled command bytes are echoed back over UART.
 
 ## How to test
 
