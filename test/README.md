@@ -22,7 +22,7 @@ pytest test.py -k "uart_handler_runner"     # Only run matching tests
 pytest test.py -k "uart_handler_runner" -s  # Only run matching tests w/ details
 ```
 
-To run gatelevel simulation, first harden the project and copy `../ runs/wokwi/final/nl/tt_um_pakesson_glitcher.nl.v` to `gate_level_netlist.v`.
+To run gatelevel simulation, first harden the project and copy `../runs/wokwi/final/nl/tt_um_pakesson_glitcher.nl.v` to `gate_level_netlist.v`.
 Then run
 ```sh
 GATES=yes pytest test.py  # Gate level tests, only runs (top level) project tests
@@ -38,7 +38,7 @@ To run the RTL simulation:
 make -B
 ```
 
-To run gatelevel simulation, first harden the project and copy `../ runs/wokwi/final/nl/tt_um_pakesson_glitcher.nl.v` to `gate_level_netlist.v`.
+To run gatelevel simulation, first harden the project and copy `../runs/wokwi/final/nl/tt_um_pakesson_glitcher.nl.v` to `gate_level_netlist.v`.
 
 Then run:
 

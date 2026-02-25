@@ -7,9 +7,12 @@ runs
 tt_submission
 src/user_config.json
 src/config_merged.json
+src/_tt_fpga_top.v
 test/sim_build
 test/__pycache__/
 test/results.xml
 test/gate_level_netlist.v
+test/.pytest_cache/
 venv/
 tt/
+build/
