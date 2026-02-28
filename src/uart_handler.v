@@ -51,6 +51,7 @@ module uart_handler #(
 
     reg [3:0] state;
     localparam STATE_IDLE = 4'd0;
+    localparam STATE_SEND_ECHO = 4'd1;
     localparam STATE_DELAY1 = 4'd2;
     localparam STATE_DELAY0 = 4'd3;
     localparam STATE_WIDTH = 4'd4;
@@ -91,10 +92,20 @@ module uart_handler #(
                             8'h73: state <= STATE_PULSE_SPACING1; // 's'
                             8'h72: state <= STATE_RESET_LENGTH1;  // 'r'
                             8'h74: state <= STATE_TRIGGER_PULSE;  // 't'
+                            8'h68: state <= STATE_SEND_HELLO;     // 'h'
                             8'h61: arm_o <= 1'b1;                 // 'a'
                             default: 
-                                state <= STATE_IDLE;
+                                begin
+                                    // Echo back the received byte for unrecognized commands
+                                    uart_tx_data <= uart_rx_data;
+                                    state <= STATE_SEND_ECHO;
+                                end
                         endcase
+                    end
+                STATE_SEND_ECHO:
+                    if (uart_tx_rdy) begin
+                        uart_tx_en <= 1'b1;
+                        state <= STATE_IDLE;
                     end
                 STATE_DELAY1:
                     if (uart_rx_valid) begin
