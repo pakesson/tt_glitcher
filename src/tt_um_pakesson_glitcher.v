@@ -18,8 +18,8 @@ module tt_um_pakesson_glitcher (
 
     wire rst = ~rst_n;
 
-    wire uart_rx = ui_in[7];
-    wire trigger_in = ui_in[6];
+    wire trigger_in = ui_in[0];
+    wire uart_rx = ui_in[1]; // Connected to GPIO18 on the RP2350
 
     wire uart_tx;
     assign uo_out[0] = uart_tx;

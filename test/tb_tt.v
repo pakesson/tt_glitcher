@@ -24,10 +24,10 @@ module tb_tt ();
     wire [7:0] uio_oe;
 
     reg uart_rx;
-    assign ui_in[7] = uart_rx;
+    assign ui_in[1] = uart_rx;
 
     reg trigger_in;
-    assign ui_in[6] = trigger_in;
+    assign ui_in[0] = trigger_in;
 
     wire uart_tx = uo_out[0];
     wire pulse_out = uo_out[1];
