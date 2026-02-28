@@ -24,8 +24,6 @@ def test_project_runner():
         sources += [
             src_dir / "tt_um_pakesson_glitcher.v",
             src_dir / "glitch_control.v",
-            src_dir / "resetter.v",
-            src_dir / "pulser.v",
             src_dir / "uart_handler.v",
             src_dir / "uart_rx.v",
             src_dir / "uart_tx.v"
@@ -41,25 +39,6 @@ def test_project_runner():
     )
 
     runner.test(hdl_toplevel="tb_tt", test_module="test_tt", waves=WAVES)
-
-@pytest.mark.skipif(GL_TEST, reason="Gate-level test not supported")
-def test_pulser_runner():
-    test_dir = Path(__file__).resolve().parent
-    src_dir = test_dir.parent / "src"
-
-    sources = [
-        src_dir / "pulser.v",
-        test_dir / "tb_pulser.v"
-    ]
-
-    runner = get_runner(SIM)
-    runner.build(
-        sources=sources,
-        hdl_toplevel="tb_pulser",
-        always=True
-    )
-
-    runner.test(hdl_toplevel="tb_pulser", test_module="test_pulser", waves=WAVES)
 
 @pytest.mark.skipif(GL_TEST, reason="Gate-level test not supported")
 def test_uart_runner():
@@ -109,8 +88,6 @@ def test_glitch_control_runner():
 
     sources = [
         src_dir / "glitch_control.v",
-        src_dir / "resetter.v",
-        src_dir / "pulser.v",
         src_dir / "uart_handler.v",
         src_dir / "uart_rx.v",
         src_dir / "uart_tx.v",
@@ -128,7 +105,6 @@ def test_glitch_control_runner():
 
 if __name__ == "__main__":
     test_project_runner()
-    test_pulser_runner()
     test_uart_runner()
     test_uart_handler_runner()
     test_glitch_control_runner()

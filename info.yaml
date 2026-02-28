@@ -22,8 +22,6 @@ project:
     - "uart_handler.v"
     - "uart_rx.v"
     - "uart_tx.v"
-    - "pulser.v"
-    - "resetter.v"
 
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.

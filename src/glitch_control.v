@@ -10,9 +10,9 @@ module glitch_control #(
     output wire uart_tx_o,
     input wire trigger_i,
     output wire pulse_o,
-    output wire target_reset_o,
+    output reg target_reset_o,
     output wire pulse_en_o,
-    output wire busy_o
+    output reg busy_o
 );
 
     wire [15:0] pulse_delay;
@@ -23,13 +23,11 @@ module glitch_control #(
 
     wire        uart_pulse_en;
     wire        uart_reset_en;
-    wire        reset_done;
+
+    reg         reset_done_strobe;
 
     wire        arm_signal;
     reg         armed;
-
-    wire        pulse_en = uart_pulse_en | (armed && trigger_i) | reset_done;
-
 
     uart_handler #(
         .CLK_FREQ(CLK_FREQ),
@@ -49,41 +47,142 @@ module glitch_control #(
         .arm_o(arm_signal)
     );
 
-    resetter resetter_inst (
-        .rst(rst),
-        .clk(clk),
-        .en(uart_reset_en),
-        .reset_length_i(reset_length),
-        .reset_o(target_reset_o),
-        .reset_done_o(reset_done)
-    );
-
-    wire pulser_pulse;
-
-    pulser pulser_inst (
-        .rst(rst),
-        .clk(clk),
-        .en(pulse_en),
-        .delay_i(pulse_delay),
-        .pulse_width_i(pulse_width),
-        .num_pulses_i(num_pulses),
-        .pulse_spacing_i(pulse_spacing),
-        .pulse_o(pulser_pulse),
-        .busy_o(busy_o)
-    );
-
+    reg pulser_pulse;
     assign pulse_o = pulser_pulse | target_reset_o;
 
+    reg [2:0] state;
+    localparam STATE_IDLE = 3'd0;
+    localparam STATE_RESET_TARGET = 3'd1;
+    localparam STATE_DELAY = 3'd2;
+    localparam STATE_PULSE_ACTIVE = 3'd3;
+    localparam STATE_PULSE_SPACE = 3'd4;
+
+    reg [15:0] phase_cnt;
+    reg [7:0]  pulse_cnt;
+
+    reg [1:0] reset_behavior;
+    localparam RESET_NONE = 2'b00;
+    localparam RESET_PULSE = 2'b01;
+    localparam RESET_ARM = 2'b10;
+
+    wire   pulse_en = uart_pulse_en | (armed && trigger_i) | (reset_done_strobe && reset_behavior == RESET_PULSE);
     assign pulse_en_o = pulse_en;
 
     always @(posedge clk) begin
         if (rst) begin
             armed <= 1'b0;
+            phase_cnt <= 16'd0;
+            pulse_cnt <= 8'd0;
+            state <= STATE_IDLE;
+            reset_behavior <= RESET_PULSE;
+            busy_o <= 1'b0;
+            target_reset_o <= 1'b0;
+            pulser_pulse <= 1'b0;
+            reset_done_strobe <= 1'b0;
+
         end else begin
+            reset_done_strobe <= 1'b0;
+            target_reset_o <= 1'b0;
+            pulser_pulse <= 1'b0;
+
             if (arm_signal)
                 armed <= 1'b1;
-            else if (pulse_en)
+            else if (pulse_en_o)
                 armed <= 1'b0;
+
+            case (state)
+                STATE_IDLE: begin
+                    target_reset_o <= 1'b0;
+                    if (uart_reset_en) begin
+                        state <= STATE_RESET_TARGET;
+                        phase_cnt <= 16'd0;
+                        target_reset_o <= 1'b1;
+
+                    end else if (uart_pulse_en) begin
+                        if (reset_length > 16'd0) begin
+                            state <= STATE_RESET_TARGET;
+                            phase_cnt <= 16'd0;
+                            target_reset_o <= 1'b1;
+                        end else begin
+                            state <= STATE_DELAY;
+                            phase_cnt <= 16'd0;
+                        end
+
+                    end else if (armed && trigger_i) begin
+                        state <= STATE_DELAY;
+                        phase_cnt <= 16'd0;
+                    end
+                end
+
+                STATE_RESET_TARGET: begin
+                    target_reset_o <= 1'b1;
+
+                    if (phase_cnt == reset_length) begin
+                        reset_done_strobe <= 1'b1;
+                        phase_cnt <= 16'd0;
+                        target_reset_o <= 1'b0;
+
+                        if (reset_behavior == RESET_PULSE) begin
+                            state <= STATE_DELAY;
+                            phase_cnt <= 16'd0;
+                        end else if (reset_behavior == RESET_ARM) begin
+                            armed <= 1'b1;
+                            state <= STATE_IDLE;
+                        end else begin
+                            state <= STATE_IDLE;
+                        end
+
+                    end else begin
+                        phase_cnt <= phase_cnt + 1'b1;
+                    end
+                end
+
+                STATE_DELAY: begin
+                    if (phase_cnt == pulse_delay) begin
+                        state <= STATE_PULSE_ACTIVE;
+                        phase_cnt <= 16'd0;
+                        pulse_cnt <= num_pulses;
+                        pulser_pulse <= 1'b1;
+                    end else begin
+                        phase_cnt <= phase_cnt + 1'b1;
+                    end
+                end
+
+                STATE_PULSE_ACTIVE: begin
+                    pulser_pulse <= 1'b1;
+
+                    if (phase_cnt == {8'd0, pulse_width}) begin
+                        phase_cnt <= 16'd0;
+
+                        pulser_pulse <= 1'b0;
+
+                        if (pulse_cnt > 1) begin
+                            state <= STATE_PULSE_SPACE;
+                            pulse_cnt <= pulse_cnt - 1'b1;
+                        end else begin
+                            state <= STATE_IDLE;
+                        end
+                    end else begin
+                        phase_cnt <= phase_cnt + 1'b1;
+                    end
+                end
+
+                STATE_PULSE_SPACE: begin
+                    pulser_pulse <= 1'b0;
+
+                    if (phase_cnt == pulse_spacing) begin
+                        state <= STATE_PULSE_ACTIVE;
+                        phase_cnt <= 16'd0;
+                        pulser_pulse <= 1'b1;
+                    end else begin
+                        phase_cnt <= phase_cnt + 1'b1;
+                    end
+                end
+
+                default: begin
+                    state <= STATE_IDLE;
+                end
+            endcase
         end
     end
 
