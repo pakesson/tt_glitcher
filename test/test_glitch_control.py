@@ -38,6 +38,47 @@ async def test_glitch_control_echo(dut):
         assert data == bytes([x]), f"Expected {x:#02x}, got {data[0]:#02x}"
 
 @cocotb.test()
+async def test_glitch_control_hello(dut):
+    dut._log.info("Start")
+
+    # Set the clock period to 20 ns (50 MHz)
+    clock = Clock(dut.clk, 20, unit="ns")
+    cocotb.start_soon(clock.start())
+
+    # Reset
+    dut._log.info("Reset")
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut._log.info("Test glitch control hello")
+
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+    uart_sink = UartSink(dut.uart_tx, baud=115200, bits=8)
+
+    await uart_source.write(b'h')
+    await uart_source.wait()
+
+    # uart_sink.read(6) should return b'Hello\n', but it only waits for the first byte
+    # and then throws an exception because the queue is empty.
+    # Let's just read one byte at a time instead.
+    data = await uart_sink.read()
+    assert data == b'H', f"Expected 'H', got {data}"
+    data = await uart_sink.read()
+    assert data == b'e', f"Expected 'e', got {data}"
+    data = await uart_sink.read()
+    assert data == b'l', f"Expected 'l', got {data}"
+    data = await uart_sink.read()
+    assert data == b'l', f"Expected 'l', got {data}"
+    data = await uart_sink.read()
+    assert data == b'o', f"Expected 'o', got {data}"
+    data = await uart_sink.read()
+    assert data == b'\n', f"Expected '\\n', got {data}"
+
+@cocotb.test()
 async def test_glitch_control_full_glitch_sequence(dut):
     dut._log.info("Start")
 
