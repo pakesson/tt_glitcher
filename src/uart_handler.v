@@ -173,32 +173,27 @@ module uart_handler #(
                     if (uart_tx_rdy && !uart_tx_en) begin
                         case (hello_state)
                             3'd0: begin
-                                uart_tx_data <= 8'h48;
+                                uart_tx_data <= 8'h45; // 'E'
                                 uart_tx_en <= 1'b1;
                                 hello_state <= 3'd1;
                             end
                             3'd1: begin
-                                uart_tx_data <= 8'h65;
+                                uart_tx_data <= 8'h72; // 'r'
                                 uart_tx_en <= 1'b1;
                                 hello_state <= 3'd2;
                             end
                             3'd2: begin
-                                uart_tx_data <= 8'h6C;
+                                uart_tx_data <= 8'h69; // 'i'
                                 uart_tx_en <= 1'b1;
                                 hello_state <= 3'd3;
                             end
                             3'd3: begin
-                                uart_tx_data <= 8'h6C;
+                                uart_tx_data <= 8'h6b; // 'k'
                                 uart_tx_en <= 1'b1;
                                 hello_state <= 3'd4;
                             end
                             3'd4: begin
-                                uart_tx_data <= 8'h6F;
-                                uart_tx_en <= 1'b1;
-                                hello_state <= 3'd5;
-                            end
-                            3'd5: begin
-                                uart_tx_data <= 8'h0A;
+                                uart_tx_data <= 8'h61; // 'a'
                                 uart_tx_en <= 1'b1;
                                 hello_state <= 3'd0;
                                 state <= STATE_IDLE;

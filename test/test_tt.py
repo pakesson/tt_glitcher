@@ -63,21 +63,19 @@ async def test_project_hello(dut):
     await uart_source.write(b'h')
     await uart_source.wait()
 
-    # uart_sink.read(6) should return b'Hello\n', but it only waits for the first byte
+    # uart_sink.read(5) should return b'Erika', but it only waits for the first byte
     # and then throws an exception because the queue is empty.
     # Let's just read one byte at a time instead.
     data = await uart_sink.read()
-    assert data == b'H', f"Expected 'H', got {data}"
+    assert data == b'E', f"Expected 'E', got {data}"
     data = await uart_sink.read()
-    assert data == b'e', f"Expected 'e', got {data}"
+    assert data == b'r', f"Expected 'r', got {data}"
     data = await uart_sink.read()
-    assert data == b'l', f"Expected 'l', got {data}"
+    assert data == b'i', f"Expected 'i', got {data}"
     data = await uart_sink.read()
-    assert data == b'l', f"Expected 'l', got {data}"
+    assert data == b'k', f"Expected 'k', got {data}"
     data = await uart_sink.read()
-    assert data == b'o', f"Expected 'o', got {data}"
-    data = await uart_sink.read()
-    assert data == b'\n', f"Expected '\\n', got {data}"
+    assert data == b'a', f"Expected 'a', got {data}"
 
 @cocotb.test()
 async def test_project_full_glitch_sequence(dut):
