@@ -54,6 +54,6 @@ module tt_um_pakesson_glitcher (
     assign uo_out[7:5] = 3'b0;
 
     // List all unused inputs to prevent warnings
-    wire _unused = &{ena, clk, ui_in[5:0], uio_in, 1'b0};
+    wire _unused = &{ena, clk, ui_in[7:2], uio_in, 1'b0};
 
 endmodule
