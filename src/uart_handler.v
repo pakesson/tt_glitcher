@@ -154,12 +154,8 @@ module uart_handler #(
                     end
                 STATE_TRIGGER_PULSE:
                     begin
-                        if (reset_length_o != 16'd0)
-                            // Set reset_en high for one clock cycle
-                            reset_en_o <= 1'b1;
-                        else
-                            // Set pulse_en high for one clock cycle
-                            pulse_en_o <= 1'b1;
+                        // Set pulse_en high for one clock cycle
+                        pulse_en_o <= 1'b1;
                         state <= STATE_IDLE;
                     end
                 STATE_SEND_HELLO:
