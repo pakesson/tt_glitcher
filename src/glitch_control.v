@@ -4,15 +4,15 @@ module glitch_control #(
     parameter CLK_FREQ = 50_000_000,
     parameter BAUD_RATE = 115200
 ) (
-    input wire rst,
-    input wire clk,
-    input wire uart_rx_i,
-    output wire uart_tx_o,
-    input wire trigger_i,
-    output wire pulse_o,
-    output reg target_reset_o,
-    output wire pulse_en_o,
-    output reg busy_o
+    input  wire  rst,
+    input  wire  clk,
+    input  wire  uart_rx_i,
+    output wire  uart_tx_o,
+    input  wire  trigger_i,
+    output wire  pulse_o,
+    output reg   target_reset_o,
+    output wire  pulse_en_o,
+    output reg   busy_o
 );
 
     wire [15:0] pulse_delay;
