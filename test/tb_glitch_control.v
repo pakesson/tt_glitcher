@@ -18,6 +18,9 @@ module tb_glitch_control ();
     reg  trigger_in;
     wire pulse_out;
     wire target_reset_out;
+    wire pulse_en_out;
+    wire busy_out;
+    wire armed_out;
 
     glitch_control #(
         .CLK_FREQ(50_000_000),
@@ -29,7 +32,10 @@ module tb_glitch_control ();
         .uart_tx_o(uart_tx),
         .trigger_i(trigger_in),
         .pulse_o(pulse_out),
-        .target_reset_o(target_reset_out)
+        .target_reset_o(target_reset_out),
+        .pulse_en_o(pulse_en_out),
+        .busy_o(busy_out),
+        .armed_o(armed_out)
     );
 
 endmodule

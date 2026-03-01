@@ -78,7 +78,7 @@ async def test_project_hello(dut):
     assert data == b'a', f"Expected 'a', got {data}"
 
 @cocotb.test(timeout_time=10, timeout_unit="ms")
-async def test_project_full_glitch_sequence(dut):
+async def test_project_full_glitch_sequence_without_reset(dut):
     dut._log.info("Start")
 
     # Set the clock period to 20 ns (50 MHz)
@@ -98,7 +98,7 @@ async def test_project_full_glitch_sequence(dut):
     dut.rst_n.value = 1
     await ClockCycles(dut.clk, 1)
 
-    dut._log.info("Test project full glitch sequence")
+    dut._log.info("Test project full glitch sequence without reset")
 
     uart_source = UartSource(dut.uart_rx, baud=115200, bits=8, stop_bits=1)
 
@@ -159,7 +159,7 @@ async def test_project_full_glitch_sequence_with_reset(dut):
     await uart_source.write(b'n\x02')     # Set num pulses
     await uart_source.write(b's\x00\x03') # Set pulse spacing
     await uart_source.write(b'r\x00\x50') # Set reset length
-    await uart_source.write(b't')         # Trigger pulse
+    await uart_source.write(b'p')         # Reset target and then pulse
 
     await RisingEdge(dut.target_reset)
     await ClockCycles(dut.clk, 1)
@@ -248,3 +248,107 @@ async def test_project_trigger(dut):
 
     await ClockCycles(dut.clk, 1)
     assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
+
+@cocotb.test(timeout_time=10, timeout_unit="ms")
+async def test_project_target_reset_only(dut):
+    dut._log.info("Start")
+
+    # Set the clock period to 20 ns (50 MHz)
+    clock = Clock(dut.clk, 20, unit="ns")
+    cocotb.start_soon(clock.start())
+
+    # Initial values
+    dut.trigger_in.value = 0
+
+    # Reset
+    dut._log.info("Reset")
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut._log.info("Test project target reset only")
+
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+    await uart_source.write(b'y')         # Reset mode 'none' (reset only)
+    await uart_source.write(b'r\x12\x34') # Set reset length
+    await uart_source.write(b'p')         # Power cycle (reset) target
+
+    await RisingEdge(dut.target_reset)
+    await ClockCycles(dut.clk, 1)
+
+    for _ in range(0x1234): # Reset
+        await ClockCycles(dut.clk, 1)
+        assert dut.pulse_out.value == 1, "Expected pulse_out to be 1" # The pulse should also be high during the reset
+        assert dut.target_reset.value == 1, "Expected target_reset to be 1"
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
+    assert dut.target_reset.value == 0, "Expected target_reset to be 0"
+
+
+@cocotb.test(timeout_time=10, timeout_unit="ms")
+async def test_project_reset_arm_trigger(dut):
+    dut._log.info("Start")
+
+    # Set the clock period to 20 ns (50 MHz)
+    clock = Clock(dut.clk, 20, unit="ns")
+    cocotb.start_soon(clock.start())
+
+    # Initial values
+    dut.trigger_in.value = 0
+
+    # Reset
+    dut._log.info("Reset")
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut._log.info("Test project reset, arm and trigger")
+
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+    await uart_source.write(b'i')         # Reset mode 'arm'
+    await uart_source.write(b'd\x00\x12') # Set delay
+    await uart_source.write(b'w\x01')     # Set width
+    await uart_source.write(b'r\x00\x80') # Set reset length
+    await uart_source.write(b'p')         # Power cycle (reset) target
+
+    await RisingEdge(dut.target_reset)
+    await ClockCycles(dut.clk, 1)
+
+    for _ in range(0x80): # Reset
+        await ClockCycles(dut.clk, 1)
+        assert dut.pulse_out.value == 1, "Expected pulse_out to be 1" # The pulse should also be high during the reset
+        assert dut.target_reset.value == 1, "Expected target_reset to be 1"
+        assert dut.armed.value == 0, "Expected armed to be 0"
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
+    assert dut.target_reset.value == 0, "Expected target_reset to be 0"
+
+    # Trigger should now be armed
+    assert dut.armed.value == 1, "Expected armed to be 1"
+
+    await ClockCycles(dut.clk, 1)
+    dut.trigger_in.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.trigger_in.value = 0
+
+    for _ in range(0x13): # Delay + 1
+        await ClockCycles(dut.clk, 1)
+        assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
+        assert dut.armed.value == 0, "Expected armed to be 0"
+
+    for _ in range(2): # Width + 1
+        await ClockCycles(dut.clk, 1)
+        assert dut.pulse_out.value == 1, "Expected pulse_out to be 1"
+        assert dut.armed.value == 0, "Expected armed to be 0"
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
+    assert dut.armed.value == 0, "Expected armed to be 0"

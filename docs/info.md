@@ -39,6 +39,7 @@ Reset modes:
 - None: 0x79 (`y`)
 - Pulse: 0x75 (`u`)
     - Reset will be directly followed by a pulse with the current settings
+    - This is the default mode.
 - Arm: 0x69 (`i`)
     - The trigger will be armed after a reset has completed
 

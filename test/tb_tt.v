@@ -33,6 +33,8 @@ module tb_tt ();
     wire pulse_out = uo_out[1];
     wire target_reset = uo_out[2];
     wire pulse_en = uo_out[3];
+    wire busy = uo_out[4];
+    wire armed = uo_out[5];
 
     tt_um_pakesson_glitcher user_project (
         .ui_in  (ui_in),    // Dedicated inputs
