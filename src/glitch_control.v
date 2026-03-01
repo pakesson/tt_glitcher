@@ -84,6 +84,7 @@ module glitch_control #(
             reset_done_strobe <= 1'b0;
             target_reset_o <= 1'b0;
             pulser_pulse <= 1'b0;
+            busy_o <= 1'b0;
 
             if (arm_signal)
                 armed <= 1'b1;
@@ -116,6 +117,7 @@ module glitch_control #(
 
                 STATE_RESET_TARGET: begin
                     target_reset_o <= 1'b1;
+                    busy_o <= 1'b1;
 
                     if (phase_cnt == reset_length) begin
                         reset_done_strobe <= 1'b1;
@@ -138,6 +140,8 @@ module glitch_control #(
                 end
 
                 STATE_DELAY: begin
+                    busy_o <= 1'b1;
+
                     if (phase_cnt == pulse_delay) begin
                         state <= STATE_PULSE_ACTIVE;
                         phase_cnt <= 16'd0;
@@ -150,6 +154,7 @@ module glitch_control #(
 
                 STATE_PULSE_ACTIVE: begin
                     pulser_pulse <= 1'b1;
+                    busy_o <= 1'b1;
 
                     if (phase_cnt == {8'd0, pulse_width}) begin
                         phase_cnt <= 16'd0;
@@ -169,6 +174,7 @@ module glitch_control #(
 
                 STATE_PULSE_SPACE: begin
                     pulser_pulse <= 1'b0;
+                    busy_o <= 1'b1;
 
                     if (phase_cnt == pulse_spacing) begin
                         state <= STATE_PULSE_ACTIVE;
