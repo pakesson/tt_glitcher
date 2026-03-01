@@ -98,14 +98,14 @@ module uart_handler #(
                 STATE_IDLE:
                     if (uart_rx_valid) begin
                         case (uart_rx_data)
-                            8'h64: state <= STATE_DELAY1;           // 'd'
-                            8'h77: state <= STATE_WIDTH;            // 'w'
-                            8'h6E: state <= STATE_NUM_PULSES;       // 'n'
-                            8'h73: state <= STATE_PULSE_SPACING1;   // 's'
-                            8'h72: state <= STATE_RESET_LENGTH1;    // 'r'
-                            8'h74: state <= STATE_TRIGGER_PULSE;    // 't'
-                            8'h68: state <= STATE_SEND_HELLO;       // 'h'
-                            8'h61: arm_o <= 1'b1;                   // 'a'
+                            8'h64: state <= STATE_DELAY1;           // 'd', set pulse delay
+                            8'h77: state <= STATE_WIDTH;            // 'w', set pulse width
+                            8'h6E: state <= STATE_NUM_PULSES;       // 'n', set number of pulses
+                            8'h73: state <= STATE_PULSE_SPACING1;   // 's', set pulse spacing
+                            8'h72: state <= STATE_RESET_LENGTH1;    // 'r', set reset length
+                            8'h74: state <= STATE_TRIGGER_PULSE;    // 't', manually trigger pulse with current settings
+                            8'h68: state <= STATE_SEND_HELLO;       // 'h', send hello message
+                            8'h61: arm_o <= 1'b1;                   // 'a', arm trigger
                             8'h70: reset_en_o <= 1'b1;              // 'p', target power cycle (reset) command
                             8'h79: reset_behavior_o <= RESET_NONE;  // 'y', set reset behavior to none
                             8'h75: reset_behavior_o <= RESET_PULSE; // 'u', set reset behavior to pulse (execute pulse after resetting)
