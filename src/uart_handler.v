@@ -15,6 +15,7 @@ module uart_handler #(
     output reg        pulse_en_o,
     output reg        reset_en_o,
     output reg [15:0] reset_length_o,
+    output reg [1:0]  reset_behavior_o,
     output reg        arm_o
 );
 
@@ -66,6 +67,10 @@ module uart_handler #(
 
     reg [2:0] hello_state;
 
+    localparam RESET_NONE = 2'b00;
+    localparam RESET_PULSE = 2'b01;
+    localparam RESET_ARM = 2'b10;
+
     always @(posedge clk) begin
         if (rst) begin
             delay_o <= 16'd0;
@@ -79,6 +84,8 @@ module uart_handler #(
             uart_tx_en <= 1'b0;
             uart_tx_data <= 8'd0;
 
+            reset_behavior_o <= RESET_PULSE;
+
             state <= STATE_IDLE;
             hello_state <= 3'd0;
         end else begin
@@ -91,14 +98,18 @@ module uart_handler #(
                 STATE_IDLE:
                     if (uart_rx_valid) begin
                         case (uart_rx_data)
-                            8'h64: state <= STATE_DELAY1;         // 'd'
-                            8'h77: state <= STATE_WIDTH;          // 'w'
-                            8'h6E: state <= STATE_NUM_PULSES;     // 'n'
-                            8'h73: state <= STATE_PULSE_SPACING1; // 's'
-                            8'h72: state <= STATE_RESET_LENGTH1;  // 'r'
-                            8'h74: state <= STATE_TRIGGER_PULSE;  // 't'
-                            8'h68: state <= STATE_SEND_HELLO;     // 'h'
-                            8'h61: arm_o <= 1'b1;                 // 'a'
+                            8'h64: state <= STATE_DELAY1;           // 'd'
+                            8'h77: state <= STATE_WIDTH;            // 'w'
+                            8'h6E: state <= STATE_NUM_PULSES;       // 'n'
+                            8'h73: state <= STATE_PULSE_SPACING1;   // 's'
+                            8'h72: state <= STATE_RESET_LENGTH1;    // 'r'
+                            8'h74: state <= STATE_TRIGGER_PULSE;    // 't'
+                            8'h68: state <= STATE_SEND_HELLO;       // 'h'
+                            8'h61: arm_o <= 1'b1;                   // 'a'
+                            8'h70: reset_en_o <= 1'b1;              // 'p', target power cycle (reset) command
+                            8'h79: reset_behavior_o <= RESET_NONE;  // 'y', set reset behavior to none
+                            8'h75: reset_behavior_o <= RESET_PULSE; // 'u', set reset behavior to pulse (execute pulse after resetting)
+                            8'h69: reset_behavior_o <= RESET_ARM;   // 'i', set reset behavior to arm (arm after resetting)
                             default: 
                                 begin
                                     // Echo back the received byte for unrecognized commands

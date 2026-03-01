@@ -29,6 +29,11 @@ module glitch_control #(
     wire        arm_signal;
     reg         armed;
 
+    wire [1:0] reset_behavior;
+    localparam RESET_NONE = 2'b00;
+    localparam RESET_PULSE = 2'b01;
+    localparam RESET_ARM = 2'b10;
+
     uart_handler #(
         .CLK_FREQ(CLK_FREQ),
         .BAUD_RATE(BAUD_RATE)
@@ -44,6 +49,7 @@ module glitch_control #(
         .pulse_en_o(uart_pulse_en),
         .reset_en_o(uart_reset_en),
         .reset_length_o(reset_length),
+        .reset_behavior_o(reset_behavior),
         .arm_o(arm_signal)
     );
 
@@ -60,11 +66,6 @@ module glitch_control #(
     reg [15:0] phase_cnt;
     reg [7:0]  pulse_cnt;
 
-    reg [1:0] reset_behavior;
-    localparam RESET_NONE = 2'b00;
-    localparam RESET_PULSE = 2'b01;
-    localparam RESET_ARM = 2'b10;
-
     wire   pulse_en = uart_pulse_en | (armed && trigger_i) | (reset_done_strobe && reset_behavior == RESET_PULSE);
     assign pulse_en_o = pulse_en;
 
@@ -74,7 +75,6 @@ module glitch_control #(
             phase_cnt <= 16'd0;
             pulse_cnt <= 8'd0;
             state <= STATE_IDLE;
-            reset_behavior <= RESET_PULSE;
             busy_o <= 1'b0;
             target_reset_o <= 1'b0;
             pulser_pulse <= 1'b0;
