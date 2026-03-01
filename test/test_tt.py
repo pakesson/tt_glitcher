@@ -4,7 +4,7 @@ from cocotb.triggers import ClockCycles, RisingEdge
 
 from cocotbext.uart import UartSink, UartSource
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_project_echo(dut):
     dut._log.info("Start")
 
@@ -38,7 +38,7 @@ async def test_project_echo(dut):
         data = await uart_sink.read()
         assert data == bytes([x]), f"Expected {x:#02x}, got {data[0]:#02x}"
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_project_hello(dut):
     dut._log.info("Start")
 
@@ -77,7 +77,7 @@ async def test_project_hello(dut):
     data = await uart_sink.read()
     assert data == b'a', f"Expected 'a', got {data}"
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_project_full_glitch_sequence(dut):
     dut._log.info("Start")
 
@@ -130,7 +130,7 @@ async def test_project_full_glitch_sequence(dut):
     await ClockCycles(dut.clk, 1)
     assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_project_full_glitch_sequence_with_reset(dut):
     dut._log.info("Start")
 
@@ -193,7 +193,7 @@ async def test_project_full_glitch_sequence_with_reset(dut):
     assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
     assert dut.target_reset.value == 0, "Expected target_reset to be 0"
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_project_trigger(dut):
     dut._log.info("Start")
 

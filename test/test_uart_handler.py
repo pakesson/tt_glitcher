@@ -4,7 +4,7 @@ from cocotb.triggers import ClockCycles, RisingEdge
 
 from cocotbext.uart import UartSink, UartSource
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_handler_echo(dut):
     dut._log.info("Start")
 
@@ -34,7 +34,7 @@ async def test_uart_handler_echo(dut):
         data = await uart_sink.read()
         assert data == bytes([x]), f"Expected {x:#02x}, got {data[0]:#02x}"
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_handler_hello(dut):
     dut._log.info("Start")
 
@@ -73,7 +73,7 @@ async def test_uart_handler_hello(dut):
     data = await uart_sink.read()
     assert data == b'a', f"Expected 'a', got {data}"
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_handler_set_delay(dut):
     dut._log.info("Start")
 
@@ -106,7 +106,7 @@ async def test_uart_handler_set_delay(dut):
     await uart_source.wait()
     assert dut.pulse_delay.value == 0xffff, f"Expected pulse_delay to be 0xffff, got {dut.pulse_delay.value}"
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_handler_set_width(dut):
     dut._log.info("Start")
 
@@ -139,7 +139,7 @@ async def test_uart_handler_set_width(dut):
     await uart_source.wait()
     assert dut.pulse_width.value == 0xff, f"Expected pulse_width to be 0xff, got {dut.pulse_width.value}"
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_handler_set_num_pulses(dut):
     dut._log.info("Start")
 
@@ -172,7 +172,7 @@ async def test_uart_handler_set_num_pulses(dut):
     await uart_source.wait()
     assert dut.num_pulses.value == 0xff, f"Expected num_pulses to be 0xff, got {dut.num_pulses.value}"
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_handler_set_pulse_spacing(dut):
     dut._log.info("Start")
 
@@ -205,7 +205,7 @@ async def test_uart_handler_set_pulse_spacing(dut):
     await uart_source.wait()
     assert dut.pulse_spacing.value == 0xffff, f"Expected pulse spacing to be 0xffff, got {dut.pulse_spacing.value}"
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_handler_trigger_pulse(dut):
     dut._log.info("Start")
 

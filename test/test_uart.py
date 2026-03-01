@@ -4,7 +4,7 @@ from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge
 
 from cocotbext.uart import UartSink, UartSource
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_tx_a(dut):
     dut._log.info("Start")
 
@@ -37,7 +37,7 @@ async def test_uart_tx_a(dut):
     await ClockCycles(dut.clk, 1)
     assert dut.uart_tx_busy.value == 0, "Expected uart_tx_busy to be 0"
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_tx_more(dut):
     dut._log.info("Start")
 
@@ -71,7 +71,7 @@ async def test_uart_tx_more(dut):
         await ClockCycles(dut.clk, 1)
         assert dut.uart_tx_busy.value == 0, "Expected uart_tx_busy to be 0"
 
-@cocotb.test()
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_rx_a(dut):
     dut._log.info("Start")
 
