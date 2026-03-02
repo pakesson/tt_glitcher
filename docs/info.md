@@ -22,11 +22,15 @@ Timing-related values are specified in number of clock cycles.
 
 Configuration:
 - Set delay: 0x64 (`d`) followed by the high byte and the low byte of the 16-bit delay value
+    - Default value: 0x0000
 - Set width: 0x77 (`w`) followed by the 8-bit width value
+    - Default value: 0x01
 - Set number of pulses: 0x6e (`n`) followed by the 8-bit number of pulses
+    - Default value: 0x01
 - Set pulse spacing: 0x73 (`s`) followed by the high byte and the low byte of the 16-bit pulse spacing value
+    - Default value: 0x0000
 - Target reset length: 0x72 (`r`) followed by the high byte and the low byte of the 16-bit target reset length value
-    - Setting this to 0 disables target reset
+    - Default value: 0x0000
 
 Actions:
 - Trigger pulse: 0x74 (`t`)
