@@ -795,3 +795,145 @@ async def test_glitch_control_ignore_external_trigger_while_busy(dut):
     for _ in range(4):
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 0, "Expected no extra pulses"
+
+
+@cocotb.test(timeout_time=10, timeout_unit="ms")
+async def test_glitch_control_no_pulse_en_on_reset_only(dut):
+    dut._log.info("Start")
+
+    clock = Clock(dut.clk, 20, unit="ns")
+    cocotb.start_soon(clock.start())
+
+    dut.trigger_in.value = 0
+
+    dut._log.info("Reset")
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut._log.info("Test pulse_en stays low for reset-only")
+
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+
+    await uart_source.write(b'y')         # Reset mode 'none'
+    await uart_source.write(b'r\x00\x03') # Set reset length = 3
+    await uart_source.write(b'p')         # Reset target only
+
+    for _ in range(6):
+        await ClockCycles(dut.clk, 1)
+        assert dut.glitch_ctrl.pulse_en.value == 0, "Expected pulse_en to stay low"
+
+
+@cocotb.test(timeout_time=10, timeout_unit="ms")
+async def test_glitch_control_armed_clears_on_uart_trigger(dut):
+    dut._log.info("Start")
+
+    clock = Clock(dut.clk, 20, unit="ns")
+    cocotb.start_soon(clock.start())
+
+    dut.trigger_in.value = 0
+
+    dut._log.info("Reset")
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut._log.info("Test armed clears on UART trigger")
+
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+
+    await uart_source.write(b'd\x00\x01') # Set delay
+    await uart_source.write(b'w\x01')     # Set width
+    await uart_source.write(b'n\x01')     # Set num pulses = 1
+    await uart_source.write(b'a')         # Arm
+    await uart_source.wait()
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.armed_out.value == 1, "Expected armed_out to be 1"
+
+    await uart_source.write(b't')         # Trigger via UART
+
+    await RisingEdge(dut.glitch_ctrl.pulse_en)
+    await ClockCycles(dut.clk, 1) # Settle
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.armed_out.value == 0, "Expected armed_out to clear"
+
+
+@cocotb.test(timeout_time=10, timeout_unit="ms")
+async def test_glitch_control_defaults_uart_trigger(dut):
+    dut._log.info("Start")
+
+    clock = Clock(dut.clk, 20, unit="ns")
+    cocotb.start_soon(clock.start())
+
+    dut.trigger_in.value = 0
+
+    dut._log.info("Reset")
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut._log.info("Test defaults: UART trigger without configuration")
+
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+
+    await uart_source.write(b't')  # Trigger pulse with defaults
+
+    await RisingEdge(dut.glitch_ctrl.pulse_en)
+    await ClockCycles(dut.clk, 1) # Settle after pulse_en goes high
+
+    highs = 0
+    for _ in range(6):
+        await ClockCycles(dut.clk, 1)
+        if dut.pulse_out.value == 1:
+            highs += 1
+
+    assert highs == 1, f"Expected one pulse with defaults, got {highs}"
+
+
+@cocotb.test(timeout_time=10, timeout_unit="ms")
+async def test_glitch_control_defaults_reset_then_pulse(dut):
+    dut._log.info("Start")
+
+    clock = Clock(dut.clk, 20, unit="ns")
+    cocotb.start_soon(clock.start())
+
+    dut.trigger_in.value = 0
+
+    dut._log.info("Reset")
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut._log.info("Test defaults: reset then pulse")
+
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+
+    await uart_source.write(b'p') # Reset target, then pulse (default)
+
+    await RisingEdge(dut.target_reset_out)
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.target_reset_out.value == 1, "Expected reset asserted"
+    assert dut.pulse_out.value == 1, "Expected pulse_out high during reset"
+
+    highs = 0
+    for _ in range(6):
+        await ClockCycles(dut.clk, 1)
+        if dut.pulse_out.value == 1 and dut.target_reset_out.value == 0:
+            highs += 1
+
+    assert highs == 1, f"Expected one pulse after reset, got {highs}"
