@@ -1,6 +1,6 @@
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles, RisingEdge
+from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge
 
 from cocotbext.uart import UartSink, UartSource
 
@@ -668,6 +668,8 @@ async def test_glitch_control_busy_during_reset_and_pulse(dut):
     await uart_source.write(b'p')         # Reset and then pulse
 
     await RisingEdge(dut.target_reset_out)
+    await FallingEdge(dut.clk) # Settle
+
     assert dut.busy_out.value == 1, "Expected busy_out to be 1 during reset"
 
     for _ in range(0x03):
