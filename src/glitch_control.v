@@ -72,6 +72,11 @@ module glitch_control #(
     assign pulser_pulse = (state == STATE_PULSE_ACTIVE);
     assign busy_o = (state != STATE_IDLE);
 
+    wire [15:0] reset_target = (reset_length == 16'd0) ? 16'd0 : (reset_length - 1'b1);
+    wire [15:0] delay_target = (pulse_delay == 16'd0) ? 16'd0 : (pulse_delay - 1'b1);
+    wire [15:0] width_target = (pulse_width == 8'd0) ? 16'd0 : ({8'd0, pulse_width} - 1'b1);
+    wire [15:0] spacing_target = (pulse_spacing == 16'd0) ? 16'd0 : (pulse_spacing - 1'b1);
+
     wire   pulse_en = uart_pulse_en | (armed && trigger_i) | (reset_done_strobe && reset_behavior == RESET_PULSE);
     assign pulse_en_o = pulse_en;
 
@@ -103,7 +108,7 @@ module glitch_control #(
                 end
 
                 STATE_RESET_TARGET: begin
-                    if (reset_length == 16'd0 || phase_cnt >= (reset_length - 1'b1)) begin
+                    if (phase_cnt == reset_target) begin
                         reset_done_strobe <= 1'b1;
                         phase_cnt <= 16'd0;
 
@@ -123,7 +128,7 @@ module glitch_control #(
                 end
 
                 STATE_DELAY: begin
-                    if (pulse_delay == 16'd0 || phase_cnt >= (pulse_delay - 1'b1)) begin
+                    if (phase_cnt == delay_target) begin
                         if (num_pulses != 8'd0) begin
                             state <= STATE_PULSE_ACTIVE;
                             pulse_cnt <= num_pulses - 1'b1;
@@ -138,7 +143,7 @@ module glitch_control #(
                 end
 
                 STATE_PULSE_ACTIVE: begin
-                    if (pulse_width == 8'd0 || phase_cnt >= ({8'd0, pulse_width} - 1'b1)) begin
+                    if (phase_cnt == width_target) begin
                         phase_cnt <= 16'd0;
 
                         if (pulse_cnt != 8'd0) begin
@@ -153,7 +158,7 @@ module glitch_control #(
                 end
 
                 STATE_PULSE_SPACE: begin
-                    if (pulse_spacing == 16'd0 || phase_cnt >= (pulse_spacing - 1'b1)) begin
+                    if (phase_cnt == spacing_target) begin
                         state <= STATE_PULSE_ACTIVE;
                         phase_cnt <= 16'd0;
                     end else begin
