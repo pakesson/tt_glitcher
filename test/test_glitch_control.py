@@ -530,8 +530,8 @@ async def test_glitch_control_zero_spacing_one_low_cycle(dut):
 
     uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
 
-    await uart_source.write(b'd\x00\x01') # Set delay
-    await uart_source.write(b'w\x01')     # Set width
+    await uart_source.write(b'd\x00\x01') # Set delay = 1
+    await uart_source.write(b'w\x01')     # Set width = 1
     await uart_source.write(b'n\x02')     # Set num pulses = 2
     await uart_source.write(b's\x00\x00') # Set spacing = 0
     await uart_source.write(b't')         # Trigger pulse
@@ -553,3 +553,137 @@ async def test_glitch_control_zero_spacing_one_low_cycle(dut):
 
     await ClockCycles(dut.clk, 1)
     assert dut.pulse_out.value == 0, "Expected pulse_out to return low"
+
+
+@cocotb.test(timeout_time=10, timeout_unit="ms")
+async def test_glitch_control_trigger_ignored_when_not_armed(dut):
+    dut._log.info("Start")
+
+    clock = Clock(dut.clk, 20, unit="ns")
+    cocotb.start_soon(clock.start())
+
+    dut.trigger_in.value = 0
+
+    dut._log.info("Reset")
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut._log.info("Test trigger ignored when not armed")
+
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+
+    await uart_source.write(b'd\x00\x01') # Set delay = 1
+    await uart_source.write(b'w\x01')     # Set width = 1
+    await uart_source.write(b'n\x01')     # Set num pulses = 1
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.armed_out.value == 0, "Expected armed_out to be 0"
+
+    dut.trigger_in.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.trigger_in.value = 0
+
+    for _ in range(6):
+        await ClockCycles(dut.clk, 1)
+        assert dut.pulse_out.value == 0, "Expected pulse_out to stay low"
+        assert dut.busy_out.value == 0, "Expected busy_out to stay low"
+
+
+@cocotb.test(timeout_time=10, timeout_unit="ms")
+async def test_glitch_control_armed_clears_on_trigger(dut):
+    dut._log.info("Start")
+
+    clock = Clock(dut.clk, 20, unit="ns")
+    cocotb.start_soon(clock.start())
+
+    dut.trigger_in.value = 0
+
+    dut._log.info("Reset")
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut._log.info("Test armed clears when trigger fires")
+
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+
+    await uart_source.write(b'd\x00\x02') # Set delay = 2
+    await uart_source.write(b'w\x01')     # Set width = 1
+    await uart_source.write(b'n\x01')     # Set num pulses = 1
+    await uart_source.write(b'a')         # Arm
+    await uart_source.wait()
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.armed_out.value == 1, "Expected armed_out to be 1"
+
+    dut.trigger_in.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.trigger_in.value = 0
+
+    for _ in range(0x02):
+        await ClockCycles(dut.clk, 1)
+        assert dut.armed_out.value == 0, "Expected armed_out to be 0 after trigger"
+        assert dut.busy_out.value == 1, "Expected busy_out to be 1 during delay"
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.pulse_out.value == 1, "Expected pulse_out to be 1"
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
+    assert dut.busy_out.value == 0, "Expected busy_out to be 0 after pulse"
+
+
+@cocotb.test(timeout_time=10, timeout_unit="ms")
+async def test_glitch_control_busy_during_reset_and_pulse(dut):
+    dut._log.info("Start")
+
+    clock = Clock(dut.clk, 20, unit="ns")
+    cocotb.start_soon(clock.start())
+
+    dut.trigger_in.value = 0
+
+    dut._log.info("Reset")
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut._log.info("Test busy_out high during reset and pulse sequence")
+
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+
+    await uart_source.write(b'd\x00\x02') # Set delay = 2
+    await uart_source.write(b'w\x01')     # Set width = 1
+    await uart_source.write(b'n\x01')     # Set num pulses = 1
+    await uart_source.write(b'r\x00\x03') # Set reset length
+    await uart_source.write(b'p')         # Reset and then pulse
+
+    await RisingEdge(dut.target_reset_out)
+    assert dut.busy_out.value == 1, "Expected busy_out to be 1 during reset"
+
+    for _ in range(0x03):
+        await ClockCycles(dut.clk, 1)
+        assert dut.busy_out.value == 1, "Expected busy_out to stay 1 during reset"
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.busy_out.value == 1, "Expected busy_out to stay 1 during delay"
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.pulse_out.value == 0, "Expected pulse_out low during delay"
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.pulse_out.value == 1, "Expected pulse_out high during pulse"
+    assert dut.busy_out.value == 1, "Expected busy_out high during pulse"
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.pulse_out.value == 0, "Expected pulse_out low after pulse"
+    assert dut.busy_out.value == 0, "Expected busy_out low after sequence"
