@@ -109,19 +109,19 @@ async def test_project_full_glitch_sequence_without_reset(dut):
     await RisingEdge(dut.glitch_ctrl.pulse_en)
     await ClockCycles(dut.clk, 1)
 
-    for _ in range(0x13): # Delay + 1
+    for _ in range(0x12): # Delay
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
 
-    for _ in range(2): # Width + 1
+    for _ in range(0x01): # Width
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 1, "Expected pulse_out to be 1"
 
-    for _ in range(4): # Spacing + 1
+    for _ in range(0x03): # Spacing
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
 
-    for _ in range(2): # Width + 1
+    for _ in range(0x01): # Width
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 1, "Expected pulse_out to be 1"
 
@@ -160,29 +160,28 @@ async def test_glitch_control_full_glitch_sequence_with_reset(dut):
     await uart_source.write(b'p')         # Reset target and then pulse
 
     await RisingEdge(dut.target_reset_out)
-    await ClockCycles(dut.clk, 1)
 
     for x in range(0x50): # Reset
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 1, "Expected pulse_out to be 1" # The pulse should also be high during the reset
         assert dut.target_reset_out.value == 1, "Expected target_reset_out to be 1"
 
-    for _ in range(0x13): # Delay + 1
+    for _ in range(0x12): # Delay
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
         assert dut.target_reset_out.value == 0, "Expected target_reset_out to be 0"
 
-    for _ in range(2): # Width + 1
+    for _ in range(0x01): # Width
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 1, "Expected pulse_out to be 1"
         assert dut.target_reset_out.value == 0, "Expected target_reset_out to be 0"
 
-    for _ in range(4): # Spacing + 1
+    for _ in range(0x03): # Spacing
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
         assert dut.target_reset_out.value == 0, "Expected target_reset_out to be 0"
 
-    for _ in range(2): # Width + 1
+    for _ in range(0x01): # Width
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 1, "Expected pulse_out to be 1"
         assert dut.target_reset_out.value == 0, "Expected target_reset_out to be 0"
@@ -228,19 +227,19 @@ async def test_glitch_control_trigger(dut):
     await ClockCycles(dut.clk, 1)
     dut.trigger_in.value = 0
 
-    for _ in range(0x13): # Delay + 1
+    for _ in range(0x12): # Delay
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
 
-    for _ in range(2): # Width + 1
+    for _ in range(0x01): # Width
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 1, "Expected pulse_out to be 1"
 
-    for _ in range(4): # Spacing + 1
+    for _ in range(0x03): # Spacing
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
 
-    for _ in range(2): # Width + 1
+    for _ in range(0x01): # Width
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 1, "Expected pulse_out to be 1"
 
@@ -275,7 +274,6 @@ async def test_glitch_control_target_reset_only(dut):
     await uart_source.write(b'p')         # Power cycle (reset) target
 
     await RisingEdge(dut.target_reset_out)
-    await ClockCycles(dut.clk, 1)
 
     for _ in range(0x1234): # Reset
         await ClockCycles(dut.clk, 1)
@@ -317,7 +315,6 @@ async def test_glitch_control_reset_arm_trigger(dut):
     await uart_source.write(b'p')         # Power cycle (reset) target
 
     await RisingEdge(dut.target_reset_out)
-    await ClockCycles(dut.clk, 1)
 
     for _ in range(0x80): # Reset
         await ClockCycles(dut.clk, 1)
@@ -337,12 +334,12 @@ async def test_glitch_control_reset_arm_trigger(dut):
     await ClockCycles(dut.clk, 1)
     dut.trigger_in.value = 0
 
-    for _ in range(0x13): # Delay + 1
+    for _ in range(0x12): # Delay
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
         assert dut.armed_out.value == 0, "Expected armed_out to be 0"
 
-    for _ in range(2): # Width + 1
+    for _ in range(0x01): # Width
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 1, "Expected pulse_out to be 1"
         assert dut.armed_out.value == 0, "Expected armed_out to be 0"

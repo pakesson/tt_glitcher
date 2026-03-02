@@ -74,8 +74,8 @@ module uart_handler #(
     always @(posedge clk) begin
         if (rst) begin
             delay_o <= 16'd0;
-            width_o <= 8'd0;
-            num_pulses_o <= 8'd0;
+            width_o <= 8'd1; // Default to 1 clock cycle pulse width
+            num_pulses_o <= 8'd1; // Default to 1 pulse
             pulse_spacing_o <= 16'd0;
             pulse_en_o <= 1'b0;
             reset_en_o <= 1'b0;

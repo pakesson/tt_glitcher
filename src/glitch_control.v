@@ -103,7 +103,7 @@ module glitch_control #(
                 end
 
                 STATE_RESET_TARGET: begin
-                    if (phase_cnt == reset_length) begin
+                    if (reset_length == 16'd0 || phase_cnt >= (reset_length - 1'b1)) begin
                         reset_done_strobe <= 1'b1;
                         phase_cnt <= 16'd0;
 
@@ -123,20 +123,25 @@ module glitch_control #(
                 end
 
                 STATE_DELAY: begin
-                    if (phase_cnt == pulse_delay) begin
-                        state <= STATE_PULSE_ACTIVE;
+                    if (pulse_delay == 16'd0 || phase_cnt >= (pulse_delay - 1'b1)) begin
+                        if (num_pulses != 8'd0) begin
+                            state <= STATE_PULSE_ACTIVE;
+                            pulse_cnt <= num_pulses - 1'b1;
+                        end else begin
+                            state <= STATE_IDLE;
+                            pulse_cnt <= 8'd0;
+                        end
                         phase_cnt <= 16'd0;
-                        pulse_cnt <= num_pulses;
                     end else begin
                         phase_cnt <= phase_cnt + 1'b1;
                     end
                 end
 
                 STATE_PULSE_ACTIVE: begin
-                    if (phase_cnt == {8'd0, pulse_width}) begin
+                    if (pulse_width == 8'd0 || phase_cnt >= ({8'd0, pulse_width} - 1'b1)) begin
                         phase_cnt <= 16'd0;
 
-                        if (pulse_cnt > 1) begin
+                        if (pulse_cnt != 8'd0) begin
                             state <= STATE_PULSE_SPACE;
                             pulse_cnt <= pulse_cnt - 1'b1;
                         end else begin
@@ -148,7 +153,7 @@ module glitch_control #(
                 end
 
                 STATE_PULSE_SPACE: begin
-                    if (phase_cnt == pulse_spacing) begin
+                    if (pulse_spacing == 16'd0 || phase_cnt >= (pulse_spacing - 1'b1)) begin
                         state <= STATE_PULSE_ACTIVE;
                         phase_cnt <= 16'd0;
                     end else begin
