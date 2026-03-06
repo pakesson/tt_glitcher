@@ -105,7 +105,7 @@ module uart_handler #(
                             8'h72: state <= STATE_RESET_LENGTH1;    // 'r', set reset length
                             8'h74: state <= STATE_TRIGGER_PULSE;    // 't', manually trigger pulse with current settings
                             8'h68: state <= STATE_SEND_HELLO;       // 'h', send hello message
-                            8'h61: arm_o <= 1'b1;                   // 'a', arm trigger
+                            8'h61: arm_o <= 1'b1;                   // 'a', arm toggle
                             8'h70: reset_en_o <= 1'b1;              // 'p', target power cycle (reset) command
                             8'h79: reset_behavior_o <= RESET_NONE;  // 'y', set reset behavior to none
                             8'h75: reset_behavior_o <= RESET_PULSE; // 'u', set reset behavior to pulse (execute pulse after resetting)

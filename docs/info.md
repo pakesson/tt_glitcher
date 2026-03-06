@@ -35,7 +35,8 @@ Configuration:
 Actions:
 - Trigger pulse: 0x74 (`t`)
     - Manually trigger pulse with the current settings
-- Arm trigger: 0x61 (`a`)
+- Arm/disarm trigger: 0x61 (`a`)
+    - This toggles the armed/disarmed state
 - Target reset: 0x70 (`p`)
     - Power cycle target, using the configured target reset length
 

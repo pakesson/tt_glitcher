@@ -596,6 +596,52 @@ async def test_project_trigger_ignored_when_not_armed(dut):
 
 
 @cocotb.test(timeout_time=10, timeout_unit="ms")
+async def test_project_arm_toggle_disarms(dut):
+    dut._log.info("Start")
+
+    clock = Clock(dut.clk, 20, unit="ns")
+    cocotb.start_soon(clock.start())
+
+    dut.trigger_in.value = 0
+
+    dut._log.info("Reset")
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 5)
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    dut._log.info("Test arm toggle disarms")
+
+    uart_source = UartSource(dut.uart_rx, baud=115200, bits=8)
+
+    await uart_source.write(b'd\x00\x01') # Set delay = 1
+    await uart_source.write(b'w\x01')     # Set width = 1
+    await uart_source.write(b'n\x01')     # Set num pulses = 1
+    await uart_source.write(b'a')         # Arm
+    await uart_source.wait()
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.armed.value == 1, "Expected armed to be 1"
+
+    await uart_source.write(b'a')         # Toggle arm off
+    await uart_source.wait()
+
+    await ClockCycles(dut.clk, 1)
+    assert dut.armed.value == 0, "Expected armed to be 0"
+
+    dut.trigger_in.value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.trigger_in.value = 0
+
+    for _ in range(6):
+        await ClockCycles(dut.clk, 1)
+        assert dut.pulse_out.value == 0, "Expected pulse_out to stay low"
+        assert dut.busy.value == 0, "Expected busy to stay low"
+
+
+@cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_project_armed_clears_on_trigger(dut):
     dut._log.info("Start")
 

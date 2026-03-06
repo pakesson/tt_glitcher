@@ -92,7 +92,7 @@ module glitch_control #(
             reset_done_strobe <= 1'b0;
 
             if (uart_arm_signal)
-                armed <= 1'b1;
+                armed <= ~armed;
             else if (pulse_en_o)
                 armed <= 1'b0;
 
