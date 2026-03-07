@@ -36,6 +36,16 @@ module tb_tt ();
     wire busy = uo_out[4];
     wire armed = uo_out[5];
 
+    initial begin
+        clk = 0;
+        rst_n = 1;
+        ena = 1;
+        uio_in[7:0] = 0;
+        ui_in[7:2] = 0;
+        uart_rx = 1;
+        trigger_in = 0;
+    end
+
     tt_um_pakesson_glitcher user_project (
         .ui_in  (ui_in),    // Dedicated inputs
         .uo_out (uo_out),   // Dedicated outputs

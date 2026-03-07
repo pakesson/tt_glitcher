@@ -47,4 +47,12 @@ module tb_uart ();
         .tx_busy_o(uart_tx_busy)
     );
 
+    initial begin
+        clk = 0;
+        rst_n = 1;
+        uart_rx = 1;
+        uart_tx_en = 0;
+        uart_tx_data = 0;
+    end
+
 endmodule

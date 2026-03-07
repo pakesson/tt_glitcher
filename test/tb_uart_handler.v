@@ -23,6 +23,12 @@ module tb_uart_handler ();
     wire [15:0] pulse_spacing;
     wire        pulse_en;
 
+    initial begin
+        clk = 0;
+        rst_n = 1;
+        uart_rx = 1;
+    end
+
     uart_handler #(
         .CLK_FREQ(50_000_000),
         .BAUD_RATE(115200)

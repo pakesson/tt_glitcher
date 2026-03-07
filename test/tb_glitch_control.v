@@ -22,6 +22,13 @@ module tb_glitch_control ();
     wire busy_out;
     wire armed_out;
 
+    initial begin
+        clk = 0;
+        rst_n = 1;
+        uart_rx = 1;
+        trigger_in = 0;
+    end
+
     glitch_control #(
         .CLK_FREQ(50_000_000),
         .BAUD_RATE(115200)
