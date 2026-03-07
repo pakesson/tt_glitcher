@@ -38,7 +38,7 @@ def test_project_runner():
         always=True
     )
 
-    runner.test(hdl_toplevel="tb_tt", test_module="test_tt", waves=WAVES)
+    runner.test(hdl_toplevel="tb_tt", test_module="test.test_tt", waves=WAVES)
 
 @pytest.mark.skipif(GL_TEST, reason="Gate-level test not supported")
 def test_uart_runner():
@@ -58,7 +58,7 @@ def test_uart_runner():
         always=True
     )
 
-    runner.test(hdl_toplevel="tb_uart", test_module="test_uart", waves=WAVES)
+    runner.test(hdl_toplevel="tb_uart", test_module="test.test_uart", waves=WAVES)
 
 @pytest.mark.skipif(GL_TEST, reason="Gate-level test not supported")
 def test_uart_handler_runner():
@@ -79,7 +79,7 @@ def test_uart_handler_runner():
         always=True
     )
 
-    runner.test(hdl_toplevel="tb_uart_handler", test_module="test_uart_handler", waves=WAVES)
+    runner.test(hdl_toplevel="tb_uart_handler", test_module="test.test_uart_handler", waves=WAVES)
 
 @pytest.mark.skipif(GL_TEST, reason="Gate-level test not supported")
 def test_glitch_control_runner():
@@ -101,7 +101,7 @@ def test_glitch_control_runner():
         always=True
     )
 
-    runner.test(hdl_toplevel="tb_glitch_control", test_module="test_glitch_control", waves=WAVES)
+    runner.test(hdl_toplevel="tb_glitch_control", test_module="test.test_glitch_control", waves=WAVES)
 
 if __name__ == "__main__":
     test_project_runner()

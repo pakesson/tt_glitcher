@@ -1,25 +1,15 @@
 import cocotb
-from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge
 
 from cocotbext.uart import UartSink, UartSource
+
+from .common import start_clock_and_reset
 
 @cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_tx_a(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test UART TX A")
 
@@ -41,18 +31,7 @@ async def test_uart_tx_a(dut):
 async def test_uart_tx_more(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test UART TX, bytes 0x00 to 0x0f")
 
@@ -75,18 +54,7 @@ async def test_uart_tx_more(dut):
 async def test_uart_rx_a(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test UART RX A")
 

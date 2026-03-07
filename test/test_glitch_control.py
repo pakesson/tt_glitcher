@@ -1,28 +1,15 @@
 import cocotb
-from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge
 
 from cocotbext.uart import UartSink, UartSource
+
+from .common import read_exact, start_clock_and_reset
 
 @cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_glitch_control_echo(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Initial values
-    dut.trigger_in.value = 0
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test glitch control echo")
 
@@ -41,18 +28,7 @@ async def test_glitch_control_echo(dut):
 async def test_glitch_control_hello(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test glitch control hello")
 
@@ -62,39 +38,14 @@ async def test_glitch_control_hello(dut):
     await uart_source.write(b'h')
     await uart_source.wait()
 
-    # uart_sink.read(5) should return b'Erika', but it only waits for the first byte
-    # and then throws an exception because the queue is empty.
-    # Let's just read one byte at a time instead.
-    data = await uart_sink.read()
-    assert data == b'E', f"Expected 'E', got {data}"
-    data = await uart_sink.read()
-    assert data == b'r', f"Expected 'r', got {data}"
-    data = await uart_sink.read()
-    assert data == b'i', f"Expected 'i', got {data}"
-    data = await uart_sink.read()
-    assert data == b'k', f"Expected 'k', got {data}"
-    data = await uart_sink.read()
-    assert data == b'a', f"Expected 'a', got {data}"
+    data = await read_exact(uart_sink, 5)
+    assert data == b"Erika", f"Expected 'Erika', got {data}"
 
 @cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_project_full_glitch_sequence_without_reset(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Initial values
-    dut.trigger_in.value = 0
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test glitch control full glitch sequence without reset")
 
@@ -132,21 +83,7 @@ async def test_project_full_glitch_sequence_without_reset(dut):
 async def test_glitch_control_full_glitch_sequence_with_reset(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Initial values
-    dut.trigger_in.value = 0
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test glitch control full glitch sequence with reset")
 
@@ -194,21 +131,7 @@ async def test_glitch_control_full_glitch_sequence_with_reset(dut):
 async def test_glitch_control_trigger(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Initial values
-    dut.trigger_in.value = 0
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test glitch control full glitch sequence")
 
@@ -250,21 +173,7 @@ async def test_glitch_control_trigger(dut):
 async def test_glitch_control_target_reset_only(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Initial values
-    dut.trigger_in.value = 0
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test glitch control target reset only")
 
@@ -289,21 +198,7 @@ async def test_glitch_control_target_reset_only(dut):
 async def test_glitch_control_reset_arm_trigger(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Initial values
-    dut.trigger_in.value = 0
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test glitch control reset, arm and trigger")
 
@@ -353,18 +248,7 @@ async def test_glitch_control_reset_arm_trigger(dut):
 async def test_glitch_control_num_pulses_zero_no_pulse(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test num_pulses=0 yields no pulse")
 
@@ -391,18 +275,7 @@ async def test_glitch_control_num_pulses_zero_no_pulse(dut):
 async def test_glitch_control_num_pulses_one_no_spacing(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test num_pulses=1 no spacing phase")
 
@@ -435,18 +308,7 @@ async def test_glitch_control_num_pulses_one_no_spacing(dut):
 async def test_glitch_control_zero_delay_immediate_pulse(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test zero delay starts pulse immediately")
 
@@ -474,18 +336,7 @@ async def test_glitch_control_zero_delay_immediate_pulse(dut):
 async def test_glitch_control_zero_width_one_cycle(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test zero width is one cycle")
 
@@ -513,18 +364,7 @@ async def test_glitch_control_zero_width_one_cycle(dut):
 async def test_glitch_control_zero_spacing_one_low_cycle(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test zero spacing yields single low cycle")
 
@@ -559,18 +399,7 @@ async def test_glitch_control_zero_spacing_one_low_cycle(dut):
 async def test_glitch_control_trigger_ignored_when_not_armed(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test trigger ignored when not armed")
 
@@ -597,18 +426,7 @@ async def test_glitch_control_trigger_ignored_when_not_armed(dut):
 async def test_glitch_control_arm_toggle_disarms(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test arm toggle disarms")
 
@@ -643,18 +461,7 @@ async def test_glitch_control_arm_toggle_disarms(dut):
 async def test_glitch_control_armed_clears_on_trigger(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test armed clears when trigger fires")
 
@@ -690,18 +497,7 @@ async def test_glitch_control_armed_clears_on_trigger(dut):
 async def test_glitch_control_busy_during_reset_and_pulse(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test busy_out high during reset and pulse sequence")
 
@@ -741,18 +537,7 @@ async def test_glitch_control_busy_during_reset_and_pulse(dut):
 async def test_glitch_control_ignore_trigger_while_busy(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test trigger ignored while busy")
 
@@ -792,18 +577,7 @@ async def test_glitch_control_ignore_trigger_while_busy(dut):
 async def test_glitch_control_ignore_external_trigger_while_busy(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test external trigger ignored while busy")
 
@@ -849,18 +623,7 @@ async def test_glitch_control_ignore_external_trigger_while_busy(dut):
 async def test_glitch_control_no_pulse_en_on_reset_only(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test pulse_en stays low for reset-only")
 
@@ -879,18 +642,7 @@ async def test_glitch_control_no_pulse_en_on_reset_only(dut):
 async def test_glitch_control_armed_clears_on_uart_trigger(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test armed clears on UART trigger")
 
@@ -918,18 +670,7 @@ async def test_glitch_control_armed_clears_on_uart_trigger(dut):
 async def test_glitch_control_defaults_uart_trigger(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test defaults: UART trigger without configuration")
 
@@ -953,18 +694,7 @@ async def test_glitch_control_defaults_uart_trigger(dut):
 async def test_glitch_control_defaults_reset_then_pulse(dut):
     dut._log.info("Start")
 
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    dut.trigger_in.value = 0
-
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test defaults: reset then pulse")
 

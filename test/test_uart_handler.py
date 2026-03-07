@@ -1,25 +1,15 @@
 import cocotb
-from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, RisingEdge
 
 from cocotbext.uart import UartSink, UartSource
+
+from .common import read_exact, start_clock_and_reset
 
 @cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_handler_echo(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test UART handler echo")
 
@@ -38,18 +28,7 @@ async def test_uart_handler_echo(dut):
 async def test_uart_handler_hello(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test UART handler hello")
 
@@ -59,36 +38,14 @@ async def test_uart_handler_hello(dut):
     await uart_source.write(b'h')
     await uart_source.wait()
 
-    # uart_sink.read(5) should return b'Erika', but it only waits for the first byte
-    # and then throws an exception because the queue is empty.
-    # Let's just read one byte at a time instead.
-    data = await uart_sink.read()
-    assert data == b'E', f"Expected 'E', got {data}"
-    data = await uart_sink.read()
-    assert data == b'r', f"Expected 'r', got {data}"
-    data = await uart_sink.read()
-    assert data == b'i', f"Expected 'i', got {data}"
-    data = await uart_sink.read()
-    assert data == b'k', f"Expected 'k', got {data}"
-    data = await uart_sink.read()
-    assert data == b'a', f"Expected 'a', got {data}"
+    data = await read_exact(uart_sink, 5)
+    assert data == b"Erika", f"Expected 'Erika', got {data}"
 
 @cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_uart_handler_set_delay(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test UART handler set delay")
 
@@ -110,18 +67,7 @@ async def test_uart_handler_set_delay(dut):
 async def test_uart_handler_set_width(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test UART handler set width")
 
@@ -143,18 +89,7 @@ async def test_uart_handler_set_width(dut):
 async def test_uart_handler_set_num_pulses(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test UART handler set num pulses")
 
@@ -176,18 +111,7 @@ async def test_uart_handler_set_num_pulses(dut):
 async def test_uart_handler_set_pulse_spacing(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test UART handler set pulse spacing")
 
@@ -209,18 +133,7 @@ async def test_uart_handler_set_pulse_spacing(dut):
 async def test_uart_handler_trigger_pulse(dut):
     dut._log.info("Start")
 
-    # Set the clock period to 20 ns (50 MHz)
-    clock = Clock(dut.clk, 20, unit="ns")
-    cocotb.start_soon(clock.start())
-
-    # Reset
-    dut._log.info("Reset")
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
-    dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 5)
-    dut.rst_n.value = 1
-    await ClockCycles(dut.clk, 1)
+    await start_clock_and_reset(dut)
 
     dut._log.info("Test UART handler trigger pulse")
 
