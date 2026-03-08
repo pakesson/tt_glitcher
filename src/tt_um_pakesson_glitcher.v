@@ -34,6 +34,8 @@ module tt_um_pakesson_glitcher (
     assign uo_out[3] = pulse_en_out;
     assign uo_out[4] = busy_out;
     assign uo_out[5] = armed_out;
+    assign uo_out[6] = ~pulse_out;
+    assign uo_out[7] = ~target_reset_out;
 
     glitch_control #(
         .CLK_FREQ(50_000_000),
@@ -54,7 +56,6 @@ module tt_um_pakesson_glitcher (
     // All output pins must be assigned. If not used, assign to 0.
     assign uio_out = 0;
     assign uio_oe  = 0;
-    assign uo_out[7:6] = 2'b0;
 
     // List all unused inputs to prevent warnings
     wire _unused = &{ena, clk, ui_in[7:2], uio_in, 1'b0};

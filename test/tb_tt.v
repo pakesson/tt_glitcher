@@ -2,7 +2,7 @@
 `timescale 1ns / 1ps
 
 /* This testbench just instantiates the module and makes some convenient wires
-   that can be driven / tested by the cocotb test.py.
+   that can be driven / tested by the cocotb tests.py.
 */
 module tb_tt ();
 

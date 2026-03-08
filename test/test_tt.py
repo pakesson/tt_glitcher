@@ -102,30 +102,42 @@ async def test_project_full_glitch_sequence_with_reset(dut):
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 1, "Expected pulse_out to be 1" # The pulse should also be high during the reset
         assert dut.target_reset.value == 1, "Expected target_reset to be 1"
+        assert dut.uo_out.value[6] == 0, "Expected pulse_out (inverted) to be 0 during reset"
+        assert dut.uo_out.value[7] == 0, "Expected target_reset (inverted) to be 0 during reset"
 
     for _ in range(0x12): # Delay
         await ClockCycles(dut.clk, 1)
-        assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
-        assert dut.target_reset.value == 0, "Expected target_reset to be 0"
+        assert dut.pulse_out.value == 0, "Expected pulse_out to be 0 during delay"
+        assert dut.target_reset.value == 0, "Expected target_reset to be 0 during delay"
+        assert dut.uo_out.value[6] == 1, "Expected pulse_out (inverted) to be 1 during delay"
+        assert dut.uo_out.value[7] == 1, "Expected target_reset (inverted) to be 1 during delay"
 
     for _ in range(0x01): # Width
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 1, "Expected pulse_out to be 1"
         assert dut.target_reset.value == 0, "Expected target_reset to be 0"
+        assert dut.uo_out.value[6] == 0, "Expected pulse_out (inverted) to be 0"
+        assert dut.uo_out.value[7] == 1, "Expected target_reset (inverted) to be 1"
 
     for _ in range(0x03): # Spacing
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
         assert dut.target_reset.value == 0, "Expected target_reset to be 0"
+        assert dut.uo_out.value[6] == 1, "Expected pulse_out (inverted) to be 1"
+        assert dut.uo_out.value[7] == 1, "Expected target_reset (inverted) to be 1"
 
     for _ in range(0x01): # Width
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 1, "Expected pulse_out to be 1"
         assert dut.target_reset.value == 0, "Expected target_reset to be 0"
+        assert dut.uo_out.value[6] == 0, "Expected pulse_out (inverted) to be 0"
+        assert dut.uo_out.value[7] == 1, "Expected target_reset (inverted) to be 1"
 
     await ClockCycles(dut.clk, 1)
     assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
     assert dut.target_reset.value == 0, "Expected target_reset to be 0"
+    assert dut.uo_out.value[6] == 1, "Expected pulse_out (inverted) to be 1"
+    assert dut.uo_out.value[7] == 1, "Expected target_reset (inverted) to be 1"
 
 @cocotb.test(timeout_time=10, timeout_unit="ms")
 async def test_project_trigger(dut):
