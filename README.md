@@ -3,4 +3,8 @@
 Pulse generator with trigger input and configurable parameters, controllable over UART.
 This project was created for [Tiny Tapeout IHP26a](https://www.tinytapeout.com/).
 
-See the TT submission documentation under [docs/info.md](./docs/info.md).
+Documentation for the TT submission can be found under [docs/info.md](./docs/info.md).
+
+See the design in 3D in the [interactive GDS viewer](https://pakesson.github.io/tt_glitcher).
+
+[![GDS render](https://pakesson.github.io/tt_glitcher/gds_render.png)](https://pakesson.github.io/tt_glitcher)
