@@ -32,7 +32,9 @@ module glitch_control #(
     assign      armed_o = armed;
 
     wire [1:0] reset_behavior;
-    localparam RESET_NONE = 2'b00;
+    // verilator lint_off UNUSEDPARAM
+    localparam RESET_NONE = 2'b00; // Not currently used here, but kept to match uart_handler
+    // verilator lint_on UNUSEDPARAM
     localparam RESET_PULSE = 2'b01;
     localparam RESET_ARM = 2'b10;
 
