@@ -16,10 +16,10 @@ localparam CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
 localparam CLK_CNT_WIDTH = $clog2(CLKS_PER_BIT);
 
 reg [1:0] state;
-localparam UART_IDLE = 2'd0;
-localparam UART_DATA  = 2'd1;
-localparam UART_STOP_1  = 2'd2;
-localparam UART_STOP_2  = 2'd3;
+localparam UART_IDLE            = 2'd0;
+localparam UART_DATA            = 2'd1;
+localparam UART_LAST_DATA_WAIT  = 2'd2;
+localparam UART_STOP_WAIT       = 2'd3;
 
 reg [7:0] data;
 reg [2:0] bit_cnt;
@@ -50,6 +50,7 @@ always @(posedge clk) begin
                     bit_cnt <= 3'd0;
                     tx_busy_o <= 1'b1;
                 end
+
             UART_DATA:
                 if (tx_strobe) begin
                     clk_cnt <= 0;
@@ -58,16 +59,18 @@ always @(posedge clk) begin
                     tx_o <= data[0];
                     data <= {data[0], data[7:1]};
 
-                    if(bit_cnt == 3'd7)
-                        state <= UART_STOP_1;
+                    if (bit_cnt == 3'd7)
+                        state <= UART_LAST_DATA_WAIT;
                 end
-            UART_STOP_1:
+
+            UART_LAST_DATA_WAIT:
                 if (tx_strobe) begin
                     clk_cnt <= 0;
                     tx_o <= 1'b1; // Stop bit
-                    state <= UART_STOP_2;
+                    state <= UART_STOP_WAIT;
                 end
-            UART_STOP_2:
+
+            UART_STOP_WAIT:
                 if (tx_strobe) begin
                     clk_cnt <= 0;
                     tx_busy_o <= 1'b0;
