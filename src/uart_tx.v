@@ -57,7 +57,7 @@ always @(posedge clk) begin
                     bit_cnt <= bit_cnt + 1'b1;
 
                     tx_o <= data[0];
-                    data <= {data[0], data[7:1]};
+                    data <= {1'b0, data[7:1]};
 
                     if (bit_cnt == 3'd7)
                         state <= UART_LAST_DATA_WAIT;
