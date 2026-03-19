@@ -9,7 +9,7 @@ module uart_tx #(
     output reg       tx_o,
     input wire [7:0] tx_data_i,
     input wire       tx_enable_i,
-    output reg       tx_busy_o
+    output wire      tx_busy_o
 );
 
 localparam CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
@@ -27,10 +27,11 @@ reg [CLK_CNT_WIDTH-1:0] clk_cnt;
 
 wire tx_strobe = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_BIT));
 
+assign tx_busy_o = (state != UART_IDLE);
+
 always @(posedge clk) begin
     if (rst) begin
         tx_o <= 1'b1;
-        tx_busy_o <= 1'b0;
 
         data <= 8'd0;
         state <= UART_IDLE;
@@ -48,7 +49,6 @@ always @(posedge clk) begin
                     state <= UART_DATA;
                     clk_cnt <= 0;
                     bit_cnt <= 3'd0;
-                    tx_busy_o <= 1'b1;
                 end
 
             UART_DATA:
@@ -73,7 +73,6 @@ always @(posedge clk) begin
             UART_STOP_WAIT:
                 if (tx_strobe) begin
                     clk_cnt <= 0;
-                    tx_busy_o <= 1'b0;
                     state <= UART_IDLE;
                 end
             default:
