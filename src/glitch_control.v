@@ -116,7 +116,6 @@ module glitch_control #(
 
                         if (reset_behavior == RESET_PULSE) begin
                             state <= STATE_DELAY;
-                            phase_cnt <= 16'd0;
                         end else if (reset_behavior == RESET_ARM) begin
                             armed <= 1'b1;
                             state <= STATE_IDLE;
