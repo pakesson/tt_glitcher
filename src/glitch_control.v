@@ -74,10 +74,10 @@ module glitch_control #(
     assign pulser_pulse = (state == STATE_PULSE_ACTIVE);
     assign busy_o = (state != STATE_IDLE);
 
-    wire [15:0] reset_target = (reset_length == 16'd0) ? 16'd0 : (reset_length - 1'b1);
-    wire [15:0] delay_target = (pulse_delay == 16'd0) ? 16'd0 : (pulse_delay - 1'b1);
-    wire [15:0] width_target = (pulse_width == 8'd0) ? 16'd0 : ({8'd0, pulse_width} - 1'b1);
-    wire [15:0] spacing_target = (pulse_spacing == 16'd0) ? 16'd0 : (pulse_spacing - 1'b1);
+    wire [15:0] reset_target = (reset_length == 16'd0) ? 16'd0 : (reset_length - 16'b1);
+    wire [15:0] delay_target = (pulse_delay == 16'd0) ? 16'd0 : (pulse_delay - 16'b1);
+    wire [15:0] width_target = (pulse_width == 8'd0) ? 16'd0 : ({8'd0, pulse_width} - 16'b1);
+    wire [15:0] spacing_target = (pulse_spacing == 16'd0) ? 16'd0 : (pulse_spacing - 16'b1);
 
     wire   pulse_en = uart_pulse_en | (armed && trigger_i) | (reset_done_strobe && reset_behavior == RESET_PULSE);
     assign pulse_en_o = pulse_en;
