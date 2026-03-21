@@ -13,7 +13,7 @@ module uart_rx #(
 
 localparam CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
 localparam CLKS_PER_HALF_BIT = CLK_FREQ / (2 * BAUD_RATE);
-localparam CLK_CNT_WIDTH = $clog2(CLKS_PER_BIT);
+localparam CLK_CNT_WIDTH = $clog2(CLKS_PER_BIT + 1);
 
 reg [1:0] state;
 localparam UART_IDLE = 2'd0;
