@@ -95,7 +95,7 @@ module glitch_control #(
 
             if (uart_arm_signal)
                 armed <= ~armed;
-            else if (pulse_en_o)
+            else if (pulse_en)
                 armed <= 1'b0;
 
             case (state)
