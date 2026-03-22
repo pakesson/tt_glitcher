@@ -117,19 +117,19 @@ When in the pulse active state, the `Pulse Out` (`uo[1]`) output is high.
 
 In the simplest use case, the host first configures the pulse parameters over UART and then sends the `t` command to start a sequence immediately. The glitcher waits for the configured delay, generates the requested number of pulses with the configured width and spacing, and then returns to the idle state.
 
-![Diagram showing manual triggering over UART](diagram_uart_manual_trigger.svg)
+![Diagram showing manual triggering over UART](diagram_uart_manual_trigger.png)
 
 ### Arm Over UART, External Trigger Input
 
 For external trigger inputs, the host sends `a` to arm the trigger logic. The glitcher then waits in the idle state with `Armed` (`uo[5]`) high until `Trigger In` (`ui[0]`) goes high, at which point it starts the same delay-and-pulse sequence as a manual UART trigger. Arming is automatically cleared when the sequence begins, so each arm command corresponds to one trigger event.
 
-![Diagram showing arming over UART and then using an external trigger](diagram_uart_arm_and_trigger_input.svg)
+![Diagram showing arming over UART and then using an external trigger](diagram_uart_arm_and_trigger_input.png)
 
 ### Reset Mode: None
 
 When reset mode is set to `None`, the `p` command only asserts `Target Reset` (`uo[2]`) for the configured reset duration. After that time has passed, the glitcher returns directly to idle without generating any pulse sequence and without arming the external trigger input.
 
-![Diagram showing the "None" reset mode](diagram_reset_mode_none.svg)
+![Diagram showing the "None" reset mode](diagram_reset_mode_none.png)
 
 ### Reset Mode: Pulse
 
@@ -137,13 +137,13 @@ When reset mode is set to `Pulse`, the `p` command first resets the target and t
 
 This is the default reset mode.
 
-![Diagram showing the "Pulse" reset mode](diagram_reset_mode_pulse.svg)
+![Diagram showing the "Pulse" reset mode](diagram_reset_mode_pulse.png)
 
 ### Reset Mode: Arm
 
 When reset mode is set to `Arm`, the `p` command resets the target and then returns to idle with the trigger logic armed. This is useful when the target should be reset first, but the actual glitch should not occur until a later external event on `Trigger In` (`ui[0]`).
 
-![Diagram showing the "Arm" reset mode](diagram_reset_mode_arm.svg)
+![Diagram showing the "Arm" reset mode](diagram_reset_mode_arm.png)
 
 ## How to Test
 
