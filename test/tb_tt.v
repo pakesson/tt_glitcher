@@ -35,6 +35,11 @@ module tb_tt ();
     wire pulse_en = uo_out[3];
     wire busy = uo_out[4];
     wire armed = uo_out[5];
+    wire pulse_or_reset = uo_out[6];
+    wire unused = uo_out[7];
+
+    wire pulse_out_n = uio_out[0];
+    wire target_reset_n = uio_out[1];
 
     initial begin
         clk = 0;

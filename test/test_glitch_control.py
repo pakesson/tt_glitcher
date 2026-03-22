@@ -100,7 +100,7 @@ async def test_glitch_control_full_glitch_sequence_with_reset(dut):
 
     for x in range(0x50): # Reset
         await ClockCycles(dut.clk, 1)
-        assert dut.pulse_out.value == 1, "Expected pulse_out to be 1" # The pulse should also be high during the reset
+        assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
         assert dut.target_reset_out.value == 1, "Expected target_reset_out to be 1"
 
     for _ in range(0x12): # Delay
@@ -186,7 +186,7 @@ async def test_glitch_control_target_reset_only(dut):
 
     for _ in range(0x1234): # Reset
         await ClockCycles(dut.clk, 1)
-        assert dut.pulse_out.value == 1, "Expected pulse_out to be 1" # The pulse should also be high during the reset
+        assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
         assert dut.target_reset_out.value == 1, "Expected target_reset_out to be 1"
 
     await ClockCycles(dut.clk, 1)
@@ -213,7 +213,7 @@ async def test_glitch_control_reset_arm_trigger(dut):
 
     for _ in range(0x80): # Reset
         await ClockCycles(dut.clk, 1)
-        assert dut.pulse_out.value == 1, "Expected pulse_out to be 1" # The pulse should also be high during the reset
+        assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
         assert dut.target_reset_out.value == 1, "Expected target_reset_out to be 1"
         assert dut.armed_out.value == 0, "Expected armed_out to be 0"
 
@@ -706,7 +706,7 @@ async def test_glitch_control_defaults_reset_then_pulse(dut):
 
     await ClockCycles(dut.clk, 1)
     assert dut.target_reset_out.value == 1, "Expected reset asserted"
-    assert dut.pulse_out.value == 1, "Expected pulse_out high during reset"
+    assert dut.pulse_out.value == 0, "Expected pulse_out low during reset"
 
     highs = 0
     for _ in range(6):

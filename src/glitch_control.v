@@ -57,9 +57,6 @@ module glitch_control #(
         .arm_o(uart_arm_signal)
     );
 
-    wire pulser_pulse;
-    assign pulse_o = pulser_pulse | target_reset_o;
-
     reg [2:0] state;
     localparam STATE_IDLE = 3'd0;
     localparam STATE_RESET_TARGET = 3'd1;
@@ -71,7 +68,7 @@ module glitch_control #(
     reg [7:0]  pulse_cnt;
 
     assign target_reset_o = (state == STATE_RESET_TARGET);
-    assign pulser_pulse = (state == STATE_PULSE_ACTIVE);
+    assign pulse_o = (state == STATE_PULSE_ACTIVE);
     assign busy_o = (state != STATE_IDLE);
 
     wire [15:0] reset_target = (reset_length == 16'd0) ? 16'd0 : (reset_length - 16'b1);
