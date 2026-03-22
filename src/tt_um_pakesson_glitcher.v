@@ -15,8 +15,11 @@ module tt_um_pakesson_glitcher (
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
-
-    wire rst = ~rst_n;
+    // Sync reset
+    reg reset;
+    always @(posedge clk) begin
+        reset <= !rst_n;
+    end
 
     // Inputs
     wire trigger_in = ui_in[0];
@@ -48,7 +51,7 @@ module tt_um_pakesson_glitcher (
         .CLK_FREQ(50_000_000),
         .BAUD_RATE(115200)
     ) glitch_ctrl (
-        .rst(rst),
+        .rst(reset),
         .clk(clk),
         .uart_rx_i(uart_rx),
         .uart_tx_o(uart_tx),
