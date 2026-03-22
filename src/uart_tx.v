@@ -13,7 +13,7 @@ module uart_tx #(
 );
 
 localparam CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
-localparam CLK_CNT_WIDTH = $clog2(CLKS_PER_BIT + 1);
+localparam CLK_CNT_WIDTH = $clog2(CLKS_PER_BIT);
 
 reg [1:0] state;
 localparam UART_IDLE            = 2'd0;
@@ -25,7 +25,7 @@ reg [7:0] data;
 reg [2:0] bit_cnt;
 reg [CLK_CNT_WIDTH-1:0] clk_cnt;
 
-wire tx_strobe = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_BIT));
+wire tx_strobe = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_BIT - 1));
 
 assign tx_busy_o = (state != UART_IDLE);
 

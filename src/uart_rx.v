@@ -13,7 +13,7 @@ module uart_rx #(
 
 localparam CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
 localparam CLKS_PER_HALF_BIT = CLK_FREQ / (2 * BAUD_RATE);
-localparam CLK_CNT_WIDTH = $clog2(CLKS_PER_BIT + 1);
+localparam CLK_CNT_WIDTH = $clog2(CLKS_PER_BIT);
 
 reg [1:0] state;
 localparam UART_IDLE = 2'd0;
@@ -23,8 +23,8 @@ localparam UART_STOP = 2'd2;
 reg [2:0] bit_cnt;
 reg [CLK_CNT_WIDTH-1:0] clk_cnt;
 
-wire rx_strobe = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_BIT));
-wire rx_strobe_half = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_HALF_BIT));
+wire rx_strobe = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_BIT - 1));
+wire rx_strobe_half = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_HALF_BIT - 1));
 
 always @(posedge clk) begin
     if (rst) begin
