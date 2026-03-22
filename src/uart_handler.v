@@ -61,9 +61,7 @@ module uart_handler #(
     localparam STATE_PULSE_SPACING0 = 4'd7;
     localparam STATE_RESET_LENGTH1 = 4'd8;
     localparam STATE_RESET_LENGTH0 = 4'd9;
-    localparam STATE_TRIGGER_PULSE = 4'd10;
-
-    localparam STATE_SEND_HELLO = 4'd11;
+    localparam STATE_SEND_HELLO = 4'd10;
 
     reg [2:0] hello_state;
 
@@ -103,7 +101,7 @@ module uart_handler #(
                             8'h6E: state <= STATE_NUM_PULSES;       // 'n', set number of pulses
                             8'h73: state <= STATE_PULSE_SPACING1;   // 's', set pulse spacing
                             8'h72: state <= STATE_RESET_LENGTH1;    // 'r', set reset length
-                            8'h74: state <= STATE_TRIGGER_PULSE;    // 't', manually trigger pulse with current settings
+                            8'h74: pulse_en_o <= 1'b1;              // 't', manually trigger pulse with current settings
                             8'h68: state <= STATE_SEND_HELLO;       // 'h', send hello message
                             8'h61: arm_o <= 1'b1;                   // 'a', arm toggle
                             8'h70: reset_en_o <= 1'b1;              // 'p', target power cycle (reset) command
@@ -161,12 +159,6 @@ module uart_handler #(
                 STATE_RESET_LENGTH0:
                     if (uart_rx_valid) begin
                         reset_length_o[7:0] <= uart_rx_data;
-                        state <= STATE_IDLE;
-                    end
-                STATE_TRIGGER_PULSE:
-                    begin
-                        // Set pulse_en high for one clock cycle
-                        pulse_en_o <= 1'b1;
                         state <= STATE_IDLE;
                     end
                 STATE_SEND_HELLO:
