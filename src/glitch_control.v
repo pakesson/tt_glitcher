@@ -38,13 +38,27 @@ module glitch_control #(
     localparam RESET_PULSE = 2'b01;
     localparam RESET_ARM = 2'b10;
 
+    reg rx_sync1, rx_sync2;
+    always @(posedge clk) begin
+        rx_sync1 <= uart_rx_i;
+        rx_sync2 <= rx_sync1;
+    end
+    wire rx_synced = rx_sync2;
+
+    reg trigger_sync1, trigger_sync2;
+    always @(posedge clk) begin
+        trigger_sync1 <= trigger_i;
+        trigger_sync2 <= trigger_sync1;
+    end
+    wire trigger_synced = trigger_sync2;
+
     uart_handler #(
         .CLK_FREQ(CLK_FREQ),
         .BAUD_RATE(BAUD_RATE)
     ) uart_hdlr (
         .rst(rst),
         .clk(clk),
-        .uart_rx_i(uart_rx_i),
+        .uart_rx_i(rx_synced),
         .uart_tx_o(uart_tx_o),
         .delay_o(pulse_delay),
         .width_o(pulse_width),
@@ -76,7 +90,7 @@ module glitch_control #(
     wire [15:0] width_target = (pulse_width == 8'd0) ? 16'd0 : ({8'd0, pulse_width} - 16'b1);
     wire [15:0] spacing_target = (pulse_spacing == 16'd0) ? 16'd0 : (pulse_spacing - 16'b1);
 
-    wire   pulse_en = uart_pulse_en | (armed && trigger_i) | (reset_done_strobe && reset_behavior == RESET_PULSE);
+    wire   pulse_en = uart_pulse_en | (armed && trigger_synced) | (reset_done_strobe && reset_behavior == RESET_PULSE);
     assign pulse_en_o = pulse_en;
 
     always @(posedge clk) begin
@@ -100,7 +114,7 @@ module glitch_control #(
                     if (uart_reset_en) begin
                         state <= STATE_RESET_TARGET;
                         phase_cnt <= 16'd0;
-                    end else if (uart_pulse_en || (armed && trigger_i)) begin
+                    end else if (uart_pulse_en || (armed && trigger_synced)) begin
                         state <= STATE_DELAY;
                         phase_cnt <= 16'd0;
                     end
