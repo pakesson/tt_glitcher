@@ -54,9 +54,9 @@ The `Pulse Out` (`uo[1]`) output can be used with an N-channel MOSFET or analog 
 
 Use `Pulse Out (Inverted)` (`uio[0]`) when your driver circuit expects an active-low enable signal.
 
-In cases where the pulse output might drive (parts of) a target during reset, the combined `Pulse Out or Target Reset` (`uo[6]`) which is high during both pulse generation and target reset.
+In cases where the pulse output might drive (parts of) a target during reset, the combined `Pulse Out or Target Reset` (`uo[6]`) output, which is high during both pulse generation and target reset.
 
-To use the `Target Reset` (or `Target Reset (Inverted)`), connect it to a power switch for the entire target.
+To use the `Target Reset` (or `Target Reset (Inverted)`), connect it to a suitable reset pin or a power switch for the entire target.
 
 ## UART Protocol
 
@@ -65,7 +65,10 @@ All communication is at 115200 baud, 8N1 (8 data bits, no parity, 1 stop bit). C
 All parameter values are either 8-bit or 16-bit unsigned integers.
 
 All timing values are specified in clock cycles at 50 MHz, where 1 cycle = 20 ns.
-The maximum value for an 8-bit parameter is 5.10 µs, while the 16-bit timing parameters go up to 1.31 ms.
+
+The minimum effective duration for all timing parameters is 1 clock cycle (20 ns). Both 0 and 1 produce a 1-cycle duration; to set a 2-cycle duration use the value 2, and so on.
+
+The maximum value for a 8-bit timing parameters is 5.10 µs, while the 16-bit timing parameters go up to 1.31 ms.
 
 ### Configuration
 
@@ -202,7 +205,7 @@ Here is a quick sanity check for these:
 
 This project had several sources of inspiration, including:
 
-* The ["NXP LPC1343 Bootloader Bypass"](https://toothless.co/blog/bootloader-bypass-part1) series of blog posts by Dmitry Nedospasov  was where I first saw this type of glitcher implemented in an FPGA.
+* The ["NXP LPC1343 Bootloader Bypass"](https://toothless.co/blog/bootloader-bypass-part1) series of blog posts by Dmitry Nedospasov is where I first saw this type of glitcher implemented in an FPGA.
 * The [Wallet.fail](https://wallet.fail/) presentation at 35C3 ([watch the presentation on YouTube](https://www.youtube.com/watch?v=Y1OBIGslgGM)), by Thomas Roth, Dmitry Nedospasov, and Josh Datko, used a very similar FPGA glitcher.
 * ... and so did the [Chip.Fail](https://www.youtube.com/watch?v=CX71p_qcCxY) presentation at Black Hat USA 2019, by Thomas Roth and Josh Datko. The code for this can be found on [GitHub](https://github.com/chipfail/chipfail-glitcher).
 * I attended one of Dmitry's in-person "Hardware hacking with FPGAs" trainings in 2019 as well, which was also a great source of inspiration.
