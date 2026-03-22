@@ -98,7 +98,7 @@ async def test_glitch_control_full_glitch_sequence_with_reset(dut):
 
     await RisingEdge(dut.target_reset_out)
 
-    for x in range(0x50): # Reset
+    for _ in range(0x50): # Reset
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
         assert dut.target_reset_out.value == 1, "Expected target_reset_out to be 1"
