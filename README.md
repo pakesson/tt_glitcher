@@ -1,6 +1,6 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-Pulse generator with trigger input and configurable parameters, controllable over UART.
+Fault injection pulse generator with trigger input and configurable parameters, controllable over UART.
 This project was created for [Tiny Tapeout IHP26a](https://www.tinytapeout.com/).
 
 Documentation for the TT submission can be found under [docs/info.md](./docs/info.md).
