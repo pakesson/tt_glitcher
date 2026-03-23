@@ -31,8 +31,12 @@ The pulse generator runs at 50 MHz, giving a timing resolution of 20 ns. This is
 
 | Pin    | Signal       | Description |
 |--------|--------------|-------------|
-| `ui[0]`| Trigger In   | External hardware trigger. When the trigger is armed, a high signal on this pin starts the glitch sequence. |
+| `ui[0]`| Trigger In   | External hardware trigger. When the trigger is armed, a high signal on this pin starts the pulse sequence. |
 | `ui[1]`| UART RX      | Serial input from the host (115200 8N1). Connect to your host's TX pin. |
+
+The trigger is activated when `Trigger In` (`ui[0]`) is high, not just on a rising edge. This means that if the trigger input is set to a constant high signal, the system will trigger immediately after being armed.
+
+Note that the trigger input is synchronized internally, so there is an initial delay of two clock cycles before starting the pulse sequence.
 
 ### Outputs
 
