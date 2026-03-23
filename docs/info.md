@@ -154,6 +154,8 @@ When reset mode is set to `Arm`, the `p` command resets the target and then retu
 
 ## How to Test
 
+All examples and oscilloscope captures in this section were taken with the project running on a Lattice UP5K FPGA on the [Tiny Tapeout FPGA Breakout](https://tinytapeout.com/guides/fpga-breakout/).
+
 ### Basic Use Cases
 
 The project can be tested by connecting a microcontroller or USB-to-serial adapter to the UART RX and TX pins (`ui[1]` and `uo[0]`, respectively).
