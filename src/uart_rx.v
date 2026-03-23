@@ -4,7 +4,7 @@ module uart_rx #(
     parameter CLK_FREQ = 50_000_000,
     parameter BAUD_RATE = 115200
 ) (
-    input wire       rst,
+    input wire       rst_n,
     input wire       clk,
     input wire       rx_i,
     output reg [7:0] data_o,
@@ -26,8 +26,8 @@ reg [CLK_CNT_WIDTH-1:0] clk_cnt;
 wire rx_strobe = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_BIT - 1));
 wire rx_strobe_half = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_HALF_BIT - 1));
 
-always @(posedge clk) begin
-    if (rst) begin
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
         data_o <= 8'd0;
         data_valid_o <= 1'b0;
 

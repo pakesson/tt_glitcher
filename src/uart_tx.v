@@ -4,7 +4,7 @@ module uart_tx #(
     parameter CLK_FREQ = 50_000_000,
     parameter BAUD_RATE = 115200
 ) (
-    input wire       rst,
+    input wire       rst_n,
     input wire       clk,
     output reg       tx_o,
     input wire [7:0] tx_data_i,
@@ -29,8 +29,8 @@ wire tx_strobe = (clk_cnt == CLK_CNT_WIDTH'(CLKS_PER_BIT - 1));
 
 assign tx_busy_o = (state != UART_IDLE);
 
-always @(posedge clk) begin
-    if (rst) begin
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
         tx_o <= 1'b1;
 
         data <= 8'd0;

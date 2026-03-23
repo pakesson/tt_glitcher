@@ -11,7 +11,6 @@ module tb_uart ();
 
     reg clk;
     reg rst_n;
-    wire rst = ~rst_n;
 
     reg uart_rx;
     wire [7:0] uart_rx_data;
@@ -21,7 +20,7 @@ module tb_uart ();
         .CLK_FREQ(50_000_000),
         .BAUD_RATE(115200)
     ) rxi (
-        .rst(rst),
+        .rst_n(rst_n),
         .clk(clk),
         .rx_i(uart_rx),
         .data_o(uart_rx_data),
@@ -39,7 +38,7 @@ module tb_uart ();
         .CLK_FREQ(50_000_000),
         .BAUD_RATE(115200)
     ) txi (
-        .rst(rst),
+        .rst_n(rst_n),
         .clk(clk),
         .tx_o(uart_tx),
         .tx_data_i(uart_tx_data),

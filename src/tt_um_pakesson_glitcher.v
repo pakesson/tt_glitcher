@@ -16,10 +16,17 @@ module tt_um_pakesson_glitcher (
     input  wire       rst_n     // reset_n - low to reset
 );
     // Sync reset
-    reg reset;
-    always @(posedge clk) begin
-        reset <= !rst_n;
+    reg rst_n_1, rst_n_2;
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            rst_n_1 <= 1'b0;
+            rst_n_2 <= 1'b0;
+        end else begin
+            rst_n_1 <= 1'b1;
+            rst_n_2 <= rst_n_1;
+        end
     end
+    wire rst_n_sync = rst_n_2;
 
     // Inputs
     wire trigger_in = ui_in[0];
@@ -51,7 +58,7 @@ module tt_um_pakesson_glitcher (
         .CLK_FREQ(50_000_000),
         .BAUD_RATE(115200)
     ) glitch_ctrl (
-        .rst(reset),
+        .rst_n(rst_n_sync),
         .clk(clk),
         .uart_rx_i(uart_rx),
         .uart_tx_o(uart_tx),

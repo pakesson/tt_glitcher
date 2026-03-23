@@ -11,7 +11,6 @@ module tb_glitch_control ();
 
     reg clk;
     reg rst_n;
-    wire rst = ~rst_n;
 
     reg uart_rx;
     wire uart_tx;
@@ -33,7 +32,7 @@ module tb_glitch_control ();
         .CLK_FREQ(50_000_000),
         .BAUD_RATE(115200)
     ) glitch_ctrl (
-        .rst(rst),
+        .rst_n(rst_n),
         .clk(clk),
         .uart_rx_i(uart_rx),
         .uart_tx_o(uart_tx),

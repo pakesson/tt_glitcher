@@ -4,7 +4,7 @@ module glitch_control #(
     parameter CLK_FREQ = 50_000_000,
     parameter BAUD_RATE = 115200
 ) (
-    input  wire  rst,
+    input  wire  rst_n,
     input  wire  clk,
     input  wire  uart_rx_i,
     output wire  uart_tx_o,
@@ -56,7 +56,7 @@ module glitch_control #(
         .CLK_FREQ(CLK_FREQ),
         .BAUD_RATE(BAUD_RATE)
     ) uart_hdlr (
-        .rst(rst),
+        .rst_n(rst_n),
         .clk(clk),
         .uart_rx_i(rx_synced),
         .uart_tx_o(uart_tx_o),
@@ -93,8 +93,8 @@ module glitch_control #(
     wire   pulse_en = uart_pulse_en | (armed && trigger_synced) | (reset_done_strobe && reset_behavior == RESET_PULSE);
     assign pulse_en_o = pulse_en;
 
-    always @(posedge clk) begin
-        if (rst) begin
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
             armed <= 1'b0;
             phase_cnt <= 16'd0;
             pulse_cnt <= 8'd0;

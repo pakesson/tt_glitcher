@@ -4,7 +4,7 @@ module uart_handler #(
     parameter CLK_FREQ = 50_000_000,
     parameter BAUD_RATE = 115200
 ) (
-    input wire        rst,
+    input wire        rst_n,
     input wire        clk,
     input wire        uart_rx_i,
     output wire       uart_tx_o,
@@ -27,7 +27,7 @@ module uart_handler #(
         .BAUD_RATE(BAUD_RATE)
     ) rxi (
         .clk(clk),
-        .rst(rst),
+        .rst_n(rst_n),
         .rx_i(uart_rx_i),
         .data_o(uart_rx_data),
         .data_valid_o(uart_rx_valid)
@@ -43,7 +43,7 @@ module uart_handler #(
         .BAUD_RATE(BAUD_RATE)
     ) txi (
         .clk(clk),
-        .rst(rst),
+        .rst_n(rst_n),
         .tx_data_i(uart_tx_data),
         .tx_enable_i(uart_tx_en),
         .tx_o(uart_tx_o),
@@ -69,8 +69,8 @@ module uart_handler #(
     localparam RESET_PULSE = 2'b01;
     localparam RESET_ARM = 2'b10;
 
-    always @(posedge clk) begin
-        if (rst) begin
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
             delay_o <= 16'd0;
             width_o <= 8'd1; // Default to 1 clock cycle pulse width
             num_pulses_o <= 8'd1; // Default to 1 pulse
