@@ -92,7 +92,7 @@ Configuration commands only update the stored parameter values.
 
 ### Reset Modes
 
-The reset mode determines what happens after the `Target Reset` command has completed.
+The reset mode determines what happens after the target reset command has completed.
 By default, a pulse sequence is started directly after resetting the target, but it is also possible to set the armed state and wait for a trigger input, or do nothing at all.
 
 | Command | Byte  | Parameters          | Default | Description                     |
@@ -116,9 +116,9 @@ When in the target reset state, the `Target Reset` (`uo[2]`) output is high.
 
 When in the pulse active state, the `Pulse Out` (`uo[1]`) output is high.
 
-The trigger is activated when `Trigger In` (`ui[0]`) is high, not just on a rising edge. This means that if the trigger input is set to a constant high signal, the system will trigger immediately after being armed.
-
 Note that the trigger input is synchronized internally, so there is an initial delay of two clock cycles before starting the pulse sequence. The pulse sequence then has a minimum of one additional delay cycle before the pulse output goes high, giving a minimum time from trigger input to pulse output of 60-80 ns (three to four clock cycles), depending on the timing of the trigger, when configured with zero additional delay.
+
+The trigger is activated when `Trigger In` (`ui[0]`) is high, not just on a rising edge. This means that if the trigger input is set to a constant high signal, the system will trigger as soon as the synchronized trigger is seen after arming.
 
 ### Manual Trigger Over UART
 
@@ -242,7 +242,7 @@ Unknown commands are echoed back directly:
 b'x'
 ```
 
-The `armed` signal can be found on `uo[5]`, and the trigger input is on `ui[0]`.
+The `Armed` signal can be found on `uo[5]`, and the trigger input is on `ui[0]`.
 Here is a quick sanity check for these:
 ```python
 >>> tt.uo_out[5]     # Check if armed (0 = not armed, 1 = armed)
