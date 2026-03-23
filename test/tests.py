@@ -61,6 +61,26 @@ def test_uart_runner():
     runner.test(hdl_toplevel="tb_uart", test_module="test.test_uart", waves=WAVES)
 
 @pytest.mark.skipif(GL_TEST, reason="Gate-level test not supported")
+def test_uart_raw_runner():
+    test_dir = Path(__file__).resolve().parent
+    src_dir = test_dir.parent / "src"
+
+    sources = [
+        src_dir / "uart_rx.v",
+        src_dir / "uart_tx.v",
+        test_dir / "tb_uart.v"
+    ]
+
+    runner = get_runner(SIM)
+    runner.build(
+        sources=sources,
+        hdl_toplevel="tb_uart",
+        always=True
+    )
+
+    runner.test(hdl_toplevel="tb_uart", test_module="test.test_uart_raw", waves=WAVES)
+
+@pytest.mark.skipif(GL_TEST, reason="Gate-level test not supported")
 def test_uart_handler_runner():
     test_dir = Path(__file__).resolve().parent
     src_dir = test_dir.parent / "src"
@@ -106,5 +126,6 @@ def test_glitch_control_runner():
 if __name__ == "__main__":
     test_project_runner()
     test_uart_runner()
+    test_uart_raw_runner()
     test_uart_handler_runner()
     test_glitch_control_runner()
