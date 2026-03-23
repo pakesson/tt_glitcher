@@ -150,6 +150,9 @@ async def test_glitch_control_trigger(dut):
     await ClockCycles(dut.clk, 1)
     dut.trigger_in.value = 0
 
+    # The trigger is synchronized internally, so we need to wait two cycles before the delay starts
+    await ClockCycles(dut.clk, 2)
+
     for _ in range(0x12): # Delay
         await ClockCycles(dut.clk, 1)
         assert dut.pulse_out.value == 0, "Expected pulse_out to be 0"
@@ -228,6 +231,9 @@ async def test_glitch_control_reset_arm_trigger(dut):
     dut.trigger_in.value = 1
     await ClockCycles(dut.clk, 1)
     dut.trigger_in.value = 0
+
+    # The trigger is synchronized internally, so we need to wait two cycles before the delay starts
+    await ClockCycles(dut.clk, 2)
 
     for _ in range(0x12): # Delay
         await ClockCycles(dut.clk, 1)
@@ -480,6 +486,9 @@ async def test_glitch_control_armed_clears_on_trigger(dut):
     await ClockCycles(dut.clk, 1)
     dut.trigger_in.value = 0
 
+    # The trigger is synchronized internally, so we need to wait two cycles before the delay starts
+    await ClockCycles(dut.clk, 2)
+
     for _ in range(0x02):
         await ClockCycles(dut.clk, 1)
         assert dut.armed_out.value == 0, "Expected armed_out to be 0 after trigger"
@@ -595,6 +604,9 @@ async def test_glitch_control_ignore_external_trigger_while_busy(dut):
     dut.trigger_in.value = 1
     await ClockCycles(dut.clk, 1)
     dut.trigger_in.value = 0
+
+    # The trigger is synchronized internally, so we need to wait two cycles before the delay starts
+    await ClockCycles(dut.clk, 2)
 
     await ClockCycles(dut.clk, 1)
     assert dut.busy_out.value == 1, "Expected busy_out to be 1 during delay"
