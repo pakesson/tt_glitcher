@@ -160,7 +160,7 @@ The project can be tested by connecting a microcontroller or USB-to-serial adapt
 
 First test that the UART works by sending `x` (hex byte `78`), which should be echoed back because it is an unknown command, or `h` which should return the string `Erika`.
 
-To test a basic pulse, set the pulse width to 100 clock cycles with `w\x64` (hex bytes `77 64`) and trigger the pulse with `t` (hex byte `74`). This should result in a pulse on the Pulse Out pin (`uo[1]`).
+To test a basic pulse, set the pulse width to 100 clock cycles (2 μs) with `w\x64` (hex bytes `77 64`) and trigger the pulse with `t` (hex byte `74`). This should result in a pulse on the Pulse Out pin (`uo[1]`).
 
 Full sequence:
 ```
@@ -170,7 +170,7 @@ t
 
 ![Oscilloscope capture of a single pulse, with width set to 100 clock cycles](oscilloscope_single_pulse_w64.png)
 
-To test multiple pulses, set the width to 50 clock cycles with `w\x32` (hex bytes `77 32`), spacing to 32 clock cycles with `s\x00\x20` (hex bytes `73 00 20`) and number of pulses to 3 with `n\x03` (hex bytes `6E 03`), then trigger the pulse with `t` (hex byte `74`).
+To test multiple pulses, set the width to 50 clock cycles (1 μs) with `w\x32` (hex bytes `77 32`), spacing to 32 clock cycles (640 ns) with `s\x00\x20` (hex bytes `73 00 20`) and number of pulses to 3 with `n\x03` (hex bytes `6E 03`), then trigger the pulse with `t` (hex byte `74`).
 
 Full sequence:
 ```
@@ -195,7 +195,7 @@ a
 
 ![Oscilloscope capture of both trigger signal and pulse output with three pulses, pulse width 50 clock cycles and spacing 32 clock cycles.](oscilloscope_trigger_no_delay.png)
 
-This can be combined with a delay. Set the delay to 100 clock cycles with `d\x00\x64` (hex bytes `64 00 64`), pulse width to 50 clock cycles with `w\x32` (hex bytes `77 64`), spacing to 32 clock cycles with `s\x00\x20` (hex bytes `73 00 20`) and number of pulses to 3 with `n\x03` (hex bytes `6E 03`).
+This can be combined with a delay. Set the delay to 100 clock cycles (2 μs) with `d\x00\x64` (hex bytes `64 00 64`), pulse width to 50 clock cycles (1 μs) with `w\x32` (hex bytes `77 64`), spacing to 32 clock cycles (640 ns) with `s\x00\x20` (hex bytes `73 00 20`) and number of pulses to 3 with `n\x03` (hex bytes `6E 03`).
 Arm with `a` (hex byte `61`) and then set the trigger input pin (`ui[0]`) to high.
 
 Full sequence:
