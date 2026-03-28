@@ -17,8 +17,8 @@ def test_project_runner():
     sources = []
     if GL_TEST:
         sources += [test_dir / "gate_level_netlist.v"]
-        sources += [PDK_ROOT / "ihp-sg13g2/libs.ref/sg13g2_io/verilog/sg13g2_io.v"]
-        sources += [PDK_ROOT / "ihp-sg13g2/libs.ref/sg13g2_stdcell/verilog/sg13g2_stdcell.v"]
+        sources += [PDK_ROOT / "ihp-sg13cmos5l/libs.ref/sg13cmos5l_io/verilog/sg13cmos5l_io.v"]
+        sources += [PDK_ROOT / "ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/verilog/sg13cmos5l_stdcell.v"]
 
     else:
         sources += [
