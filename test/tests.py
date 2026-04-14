@@ -15,10 +15,17 @@ def test_project_runner():
     src_dir = test_dir.parent / "src"
 
     sources = []
+    defines = {}
     if GL_TEST:
         sources += [test_dir / "gate_level_netlist.v"]
-        sources += [PDK_ROOT / "ihp-sg13g2/libs.ref/sg13g2_io/verilog/sg13g2_io.v"]
-        sources += [PDK_ROOT / "ihp-sg13g2/libs.ref/sg13g2_stdcell/verilog/sg13g2_stdcell.v"]
+        sources += [PDK_ROOT / "sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v"]
+        sources += [PDK_ROOT / "sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v"]
+        defines = {
+            "GL_TEST": True,
+            "FUNCTIONAL": True,
+            "USE_POWER_PINS": True,
+            "SIM": True,
+        }
 
     else:
         sources += [
@@ -35,7 +42,8 @@ def test_project_runner():
     runner.build(
         sources=sources,
         hdl_toplevel="tb_tt",
-        always=True
+        always=True,
+        defines=defines,
     )
 
     runner.test(hdl_toplevel="tb_tt", test_module="test.test_tt", waves=WAVES)
