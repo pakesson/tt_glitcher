@@ -3,7 +3,7 @@
 Fault injection pulse generator with trigger input and configurable parameters, controllable over UART.
 This project was created for [Tiny Tapeout IHP26a](https://www.tinytapeout.com/).
 
-[Read the documentation for project](docs/info.md).
+[Read the documentation for the project](docs/info.md).
 
 See the design in 3D in the [interactive GDS viewer](https://pakesson.github.io/tt_glitcher).
 
